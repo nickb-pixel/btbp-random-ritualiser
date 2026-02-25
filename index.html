@@ -1,0 +1,4669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#8b7355">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- SEO -->
+  <meta name="description" content="Crowd-sourced rituals inviting you to explore your outdoor surroundings in ways that are immediate, intimate, and unexpected.">
+  <meta name="keywords" content="ritual, Accept & Proceed, creative studio, intentional living, meditation">
+  <meta name="author" content="Accept & Proceed">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Random Ritualiser">
+  <meta property="og:description" content="Crowd-sourced rituals inviting you to explore your outdoor surroundings in ways that are immediate, intimate, and unexpected.">
+  <meta property="og:image" content="https://acceptandproceed.github.io/random-ritualiser/assets/og.png">
+  <meta property="og:url" content="https://acceptandproceed.github.io/random-ritualiser/">
+  <meta property="og:site_name" content="Accept & Proceed">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Random Ritualiser">
+  <meta name="twitter:description" content="Crowd-sourced rituals inviting you to explore your outdoor surroundings in ways that are immediate, intimate, and unexpected.">
+  <meta name="twitter:image" content="https://acceptandproceed.github.io/random-ritualiser/assets/og.png">
+
+  <title>Random Ritualiser</title>
+  <link href="https://cdn.prod.website-files.com/6654e635871c288079200113/6686b48f7cb170d35720d5ad_20.png" rel="shortcut icon" type="image/x-icon"/><link href="https://cdn.prod.website-files.com/6654e635871c288079200113/6686b3f4c905cf5ddff11a27_Group%201473.png" rel="apple-touch-icon"/><link href="https://acceptandproceed.github.io/random-ritualiser/" rel="canonical"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    /* ===========================================
+       FONT FACES
+       =========================================== */
+    @font-face {
+      font-family: 'Helvetica Neue';
+      src: url('assets/fonts/HelveticaNeue.woff2') format('woff2'),
+           url('assets/fonts/HelveticaNeue.woff') format('woff'),
+           url('assets/fonts/HelveticaNeue-Regular.otf') format('opentype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'Helvetica Neue';
+      src: url('assets/fonts/HelveticaNeue-Medium.woff2') format('woff2'),
+           url('assets/fonts/HelveticaNeue-Medium.woff') format('woff'),
+           url('assets/fonts/HelveticaNeue-Medium.otf') format('opentype');
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-weight: 500 !important;
+    }
+
+    /* ===========================================
+       TYPOGRAPHY VARIABLES
+       Edit these to change font sizes globally
+       =========================================== */
+    :root {
+      --font-large: clamp(44px, 8.5vw, 88px);
+      --font-medium: clamp(32px, 8.5vw, 53px);
+      --font-small: clamp(28px, 6.6vw, 53px);
+      --font-ui: clamp(18px, 4.75vw, 32px);
+      --font-btn: 19px;
+    }
+
+    /* Reduce fonts another 5% for short viewports */
+    @media (max-height: 600px) {
+      :root {
+        --font-large: clamp(30px, 8vw, 50px);
+        --font-medium: clamp(30px, 8vw, 50px);
+        --font-small: clamp(26px, 6.3vw, 40px);
+        --font-ui: clamp(18px, 4.5vw, 32px);
+      }
+    }
+
+    /* Reduce fonts another 5% for very short viewports */
+    @media (max-height: 500px) {
+      :root {
+        --font-large: clamp(28px, 7.6vw, 80px);
+        --font-medium: clamp(28px, 7.6vw, 48px);
+        --font-small: clamp(25px, 6vw, 48px);
+        --font-ui: clamp(17px, 4.3vw, 32px);
+      }
+    }
+
+    body {
+      min-height: 100vh;
+      width: 100%;
+      background: #4a5560; /* Fallback color */
+      position: relative;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      cursor: pointer;
+      user-select: none;
+      text-rendering: geometricPrecision;
+      font-synthesis: none;
+    }
+
+    /* Dynamic simplex noise background */
+    #bgCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      pointer-events: none;
+    }
+
+    /* Camera video background */
+    .camera-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 1.5s ease;
+      filter: blur(20px) saturate(0.75) brightness(1.05) contrast(0.9) sepia(0.25);
+      transform: scale(1.15);
+    }
+
+    .camera-video.active {
+      opacity: 0;  /* Hide video, show processed canvas instead */
+    }
+
+    /* Processed camera canvas with color mapping */
+    #cameraCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 1.5s ease;
+      pointer-events: none;
+    }
+
+    #cameraCanvas.active {
+      opacity: 1;
+    }
+
+    /* Dreamy overlay when camera is active */
+    .camera-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 1.5s ease;
+      background:
+        radial-gradient(ellipse at 50% 50%, rgba(255, 245, 230, 0.15) 0%, transparent 60%),
+        radial-gradient(ellipse at 30% 20%, rgba(200, 150, 100, 0.2) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 80%, rgba(180, 140, 100, 0.15) 0%, transparent 50%),
+        linear-gradient(180deg, rgba(160, 120, 80, 0.2) 0%, rgba(120, 100, 80, 0.15) 100%);
+    }
+
+    .camera-overlay.active {
+      opacity: 0; /* Disabled - color processing now done in canvas */
+    }
+
+    /* Vignette effect for camera */
+    .camera-overlay::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(0, 0, 0, 0.3) 100%);
+    }
+
+    /* Noise texture */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      opacity: 0.08;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2.5' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      z-index: 1;
+    }
+
+    header {
+      position: fixed;
+      top: 24px;
+      left: 24px;
+      right: 24px;
+      height: 40px;
+      margin-bottom: 40px;
+      z-index: 50;
+    }
+
+    .header-title {
+      font-size: var(--font-ui);
+      letter-spacing: -0.04em;
+      line-height: 0.94em;
+      color: #2D2D2D;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      transition: opacity 2s cubic-bezier(0.76, 0, 0.24, 1);
+    }
+
+    .header-sub {
+      font-size: var(--font-ui);
+      letter-spacing: -0.04em;
+      line-height: 0.94em;
+      color: #2D2D2D;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      transition: opacity 2s cubic-bezier(0.76, 0, 0.24, 1);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 100%;
+      padding: 24px;
+      padding-top: calc((var(--font-ui)*2) + 52px); 
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+
+    .text-block {
+      font-size: var(--font-large);
+      line-height: 0.94em;
+      letter-spacing: -0.04em;
+      transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+      width: 100%;
+      font-weight: 500;
+    }
+
+    .text-block.animating {
+      opacity: 0.3;
+      transform: scale(0.98);
+    }
+
+
+    .row-left {
+      text-align: left;
+    }
+
+    .row-right {
+      text-align: right;
+    }
+
+    .word {
+      display: inline;
+    }
+
+    .highlight {
+      color: #F5F5F5 !important;
+      text-shadow: 0 2px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .dark {
+      color: #2D2D2D;
+    }
+
+    /* ===========================================
+       UNIFIED BUTTON STYLES
+       Edit these to change all buttons at once
+       =========================================== */
+
+    /* Base styles for round (circular) buttons */
+    .btn-round {
+      width: 50px;
+      height: 50px;
+      background: rgba(45, 45, 45, 0.4);
+      border: none;
+      border-radius: 50%;
+      color: #F5F5F5;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-btn);
+      font-weight: 500;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    .btn-round svg {
+      width: 24px;
+      height: 24px;
+    }
+
+      @media (max-width: 600px) {
+        .btn-round {
+          width: 50px;
+          height: 50px;
+        }
+      }
+
+    .btn-round:hover {
+      background: rgba(45, 45, 45, 0.7);
+      transform: scale(1.05);
+    }
+
+    .btn-round:disabled,
+    .btn-round.locked {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    /* Base styles for pill (rounded rectangle) buttons */
+    .btn-pill {
+      height: 50px;
+      padding: 0 25px;
+      background: rgba(45, 45, 45, 0.4);
+      border: none;
+      border-radius: 25px;
+      color: #F5F5F5;
+      font-size: var(--font-btn);
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+
+
+     @media (max-width: 600px) {
+        .btn-pill {
+          height: 50px;
+          border-radius: 25px;
+          font-weight: 500 !important;
+        }
+      }
+
+    .btn-pill:hover {
+     background: rgba(45, 45, 45, 0.7);
+      transform: scale(1.05);
+    }
+
+    .btn-pill:disabled,
+    .btn-pill.locked {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    /* Lighter variant for buttons on dark backgrounds */
+    .btn-light {
+      background: rgba(45, 45, 45, 0.4);
+    }
+
+    .btn-light:hover {
+      background: #2D2D2D;
+    }
+
+    /* ===========================================
+       END UNIFIED BUTTON STYLES
+       =========================================== */
+
+    /* Submit button - bottom left */
+    .arrow-button {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .arrow-button.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* Regen button - top right */
+    .regen-button {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      display: none;
+    }
+
+    .regen-button.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* Icon buttons - bottom right */
+    .icon-buttons {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      gap: 12px;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease-out;
+    }
+
+    .icon-buttons.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+
+
+    .icon-btn.active {
+      background: rgba(245, 245, 245, 0.8);
+      color: #2D2D2D;
+      stroke:  #2D2D2D;
+    }
+
+    .icon-btn.active svg,   .icon-btn.active svg path{
+      stroke:  #2D2D2D;
+    }
+
+    .close-btn {
+      position: fixed;
+      top: 23px;
+      right: 22px;
+      z-index: 10;
+    }
+
+    .save-button-container {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+      z-index: 200;
+    }
+
+    .save-button-container.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .save-button{
+      background-color: rgba(245, 245, 245, 0.2);
+      width: 50px;
+      height: 50px;
+    }
+
+    @media (max-width: 600px) {
+      .save-button {
+        width: 50px;
+        height: 50px;
+        line-height: 0.93;
+      }
+    }
+
+    .save-button:hover{
+       background-color: rgba(245, 245, 245, 0.8);
+    }
+
+    .save-button:hover svg,  .save-button:hover svg path{
+       stroke: #2D2D2D;
+    }
+
+    .save-button svg {
+      /* padding: 10px; */
+    }
+
+    .save-button.saving {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    /* Flash effect when saving */
+    .flash-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #F5F5F5;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 200;
+      transition: opacity 0.1s ease;
+    }
+
+    .flash-overlay.flash {
+      opacity: 0.3;
+    }
+
+    /* Text animation styles */
+    .letter {
+      display: inline;
+      opacity: 1;
+    }
+
+    .letter.hidden {
+      opacity: 0;
+    }
+
+    .letter.reveal {
+      animation: letterReveal 0.3s ease-out forwards;
+    }
+
+    .letter.fade-in {
+      animation: letterFadeIn 0.4s ease-out forwards;
+    }
+
+    .word-hidden {
+      opacity: 0;
+    }
+
+    .word-pop {
+      animation: wordPop 0.3s ease-out forwards;
+    }
+
+    @keyframes wordPop {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* Magic 8 ball effect */
+    .highlight.m8b-active {
+      filter: url(#water-distort);
+    }
+
+    .highlight.m8b-rising {
+      animation: m8bRise 2.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .dark.m8b-active {
+      filter: url(#water-distort-subtle);
+    }
+
+    .dark.m8b-rising {
+      animation: m8bRiseDark 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes m8bRise {
+      0% {
+        opacity: 0;
+        transform: translate3d(0, 120px, 0) scale(1.8);
+      }
+      60% {
+        opacity: 0.9;
+        transform: translate3d(0, 20px, 0) scale(1.1);
+      }
+      100% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+      }
+    }
+
+    @keyframes m8bRiseDark {
+      0% {
+        opacity: 0;
+        transform: translate3d(0, 60px, 0);
+      }
+      100% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+      }
+    }
+
+    /* Scatter/Magnetic effect */
+    .scatter-letter {
+      position: fixed;
+      font-size: inherit;
+      font-weight: inherit;
+      font-family: inherit;
+      color: #F5F5F5;
+      pointer-events: none;
+      z-index: 50;
+      transition: all 2s cubic-bezier(0.23, 1, 0.32, 1);
+      opacity: 0;
+    }
+
+    .scatter-letter.visible {
+      opacity: 0.6;
+    }
+
+    .scatter-letter.settling {
+      opacity: 1;
+    }
+
+    .scatter-letter.settled {
+      opacity: 1;
+    }
+
+    .dark.scatter-hidden {
+      opacity: 0;
+    }
+
+    /* Dark scatter letters */
+    .scatter-letter-dark {
+      position: fixed;
+      font-size: inherit;
+      font-weight: inherit;
+      font-family: inherit;
+      color: #2D2D2D;
+      pointer-events: none;
+      z-index: 49;
+      transition: all 2s cubic-bezier(0.23, 1, 0.32, 1);
+      opacity: 0;
+    }
+
+    .scatter-letter-dark.visible {
+      opacity: 0.4;
+    }
+
+    .scatter-letter-dark.settling {
+      opacity: 0.8;
+    }
+
+    .scatter-letter-dark.settled {
+      opacity: 1;
+    }
+
+    @keyframes letterReveal {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes letterFadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .blur-animate {
+      filter: blur(8px);
+      transform: scale(1.05);
+      transition: filter 0.6s ease-out, transform 0.6s ease-out;
+    }
+
+    .blur-resolve {
+      filter: blur(0);
+      transform: scale(1);
+    }
+
+    /* Splash/Liquid effect */
+    .highlight.splash-active {
+      filter: url(#splash-distort);
+      opacity: 0;
+    }
+
+    .dark.splash-active {
+      filter: url(#splash-distort-dark);
+      opacity: 0;
+    }
+
+    .splash-rising {
+      animation: splashRise 2.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .splash-rising-dark {
+      animation: splashRiseDark 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes splashRise {
+      0% {
+        opacity: 0;
+        transform: translate3d(0, 100px, 0) scale(0.6);
+      }
+      20% {
+        opacity: 0.3;
+      }
+      50% {
+        opacity: 0.8;
+        transform: translate3d(0, 20px, 0) scale(0.95);
+      }
+      100% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+      }
+    }
+
+    @keyframes splashRiseDark {
+      0% {
+        opacity: 0;
+        transform: translate3d(0, 60px, 0) scale(0.8);
+      }
+      30% {
+        opacity: 0.4;
+      }
+      60% {
+        opacity: 0.8;
+        transform: translate3d(0, 10px, 0) scale(0.98);
+      }
+      100% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+      }
+    }
+
+    /* Blur resolve effect */
+    .blur-filter {
+      filter: url(#blur-resolve);
+    }
+
+    .blur-filter-dark {
+      filter: url(#blur-resolve-dark);
+    }
+
+    /* Choke effect */
+    .choke-erode {
+      filter: url(#choke-erode);
+    }
+
+    .choke-dilate {
+      filter: url(#choke-dilate);
+    }
+
+    .choke-erode-dark {
+      filter: url(#choke-erode-dark);
+    }
+
+    .choke-dilate-dark {
+      filter: url(#choke-dilate-dark);
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background: #F5F5F5;
+      margin-left: 2px;
+      animation: blink 0.7s infinite;
+      vertical-align: text-bottom;
+    }
+
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+
+    /* Effect selector */
+    .effect-selector {
+      position: fixed;
+      bottom: 24px;
+      left: 90px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    .effect-label {
+      font-size: 10px;
+      color: rgba(245, 245, 245, 0.4);
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .effect-buttons {
+      display: flex;
+      gap: 4px;
+    }
+
+    .effect-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid rgba(245, 245, 245, 0.3);
+      background: rgba(245, 245, 245, 0.05);
+      color: rgba(245, 245, 245, 0.5);
+      font-size: 12px;
+      font-weight: 500;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .effect-btn:hover {
+      background: rgba(245, 245, 245, 0.15);
+      color: rgba(245, 245, 245, 0.8);
+    }
+
+    .effect-btn.active {
+      background: rgba(245, 245, 245, 0.2);
+      border-color: rgba(245, 245, 245, 0.5);
+      color: #F5F5F5;
+    }
+
+    @media (max-width: 600px) {
+      .effect-selector {
+        bottom: 80px;
+        left: 24px;
+      }
+
+      .effect-btn {
+        width: 26px;
+        height: 26px;
+        font-size: 11px;
+      }
+
+      .effect-label {
+        font-size: 9px;
+      }
+    }
+
+    /* Submit modal */
+    /* Submit panel - full screen like info panel */
+    .submit-panel {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      z-index: 150;
+      padding: 24px;
+      padding-top: calc((var(--font-ui)*2) + 48px); 
+      transition: opacity 0.4s ease-out;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .submit-panel.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .submit-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .submit-intro-text {
+      font-size: var(--font-large);
+       line-height: 0.94em;
+      letter-spacing: -0.04em;
+      color: rgba(45, 45, 45, 1);
+      font-weight: 500;
+    }
+
+    .submit-input-area {
+      flex: 1;
+    }
+
+    .submit-text-wrapper {
+      font-size: var(--font-large);
+      line-height: 0.94em;
+      letter-spacing: -0.04em;
+      font-weight: 500;
+      word-wrap: break-word;
+    }
+
+    .submit-prefix {
+      color: #2D2D2D;
+    }
+
+    .submit-input {
+      color: #2D2D2D;
+      outline: none;
+      min-width: 2px;
+      display: inline;
+      caret-color: #2D2D2D;
+      white-space: pre-wrap;
+      word-spacing: normal;
+      -webkit-user-modify: read-write-plaintext-only;
+    }
+
+    .submit-input:empty::before {
+      content: attr(data-placeholder);
+      color: rgba(45, 45, 45, 0.4);
+    }
+
+    .submit-input:focus {
+      caret-color: #2D2D2D;
+    }
+
+    .submit-input:focus:empty::before {
+      content: attr(data-placeholder);
+      color: rgba(45, 45, 45, 0.4);
+    }
+
+    /* Blinking cursor effect */
+    @keyframes blink-cursor {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .submit-input:focus:empty::after {
+      content: '';
+      display: inline-block;
+      width: 1px;
+      height: 1.1em;
+      background: #2D2D2D;
+      animation: blink-cursor 1s step-end infinite;
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+
+    .submit-input:focus:empty {
+      position: relative;
+    }
+
+    .submit-input:focus:empty::before {
+      margin-left: 4px;
+    }
+
+    .submit-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 80px;
+    }
+
+    .submit-label {
+      font-size: var(--font-ui);
+      color: #2D2D2D;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+    }
+
+    .submit-counter {
+      font-size: var(--font-ui);
+      color: #2D2D2D;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+    }
+
+    .submit-next-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+    }
+
+    .submit-start-btn {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+    }
+
+    .submit-final-text {
+      font-size: var(--font-large);
+      line-height: 0.94em;
+      letter-spacing: -0.04em;
+      color: #F5F5F5;
+      font-weight: 500;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 300;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+    }
+
+    .modal-overlay.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: rgba(60, 55, 50, 0.95);
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 400px;
+      width: 90%;
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.visible .modal {
+      transform: translateY(0);
+    }
+
+    .modal-title {
+      font-size: 18px;
+      color: #F5F5F5;
+      margin-bottom: 8px;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    .modal-subtitle {
+      font-size: 13px;
+      color: rgba(245, 245, 245, 0.6);
+      margin-bottom: 24px;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.4;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 11px;
+      color: rgba(245, 245, 245, 0.5);
+      margin-bottom: 6px;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 14px;
+      background: rgba(245, 245, 245, 0.1);
+      border: 1px solid rgba(245, 245, 245, 0.2);
+      border-radius: 8px;
+      color: #F5F5F5;
+      font-size: var(--font-ui);
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      outline: none;
+      transition: border-color 0.2s ease, background 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .form-input:focus {
+      border-color: rgba(245, 245, 245, 0.4);
+      background: rgba(245, 245, 245, 0.15);
+    }
+
+    .form-input::placeholder {
+      color: rgba(245, 245, 245, 0.3);
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .modal-btn {
+      flex: 1;
+      padding: 12px 20px;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      transition: all 0.2s ease;
+    }
+
+    .modal-btn-cancel {
+      background: transparent;
+      border: 1px solid rgba(245, 245, 245, 0.3);
+      color: rgba(245, 245, 245, 0.7);
+    }
+
+    .modal-btn-cancel:hover {
+      background: rgba(245, 245, 245, 0.1);
+    }
+
+    .modal-btn-submit {
+      background: #F5F5F5;
+      border: none;
+      color: #333;
+    }
+
+    .modal-btn-submit:hover {
+      transform: translateY(-2px);
+    }
+
+    .modal-btn-submit:disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .modal-success {
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .modal-success-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .modal-success-text {
+      font-size: var(--font-ui);
+      color: #F5F5F5;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+    }
+
+    /* Image preview modal */
+    .image-preview-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 400;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      padding: 20px;
+    }
+
+    .image-preview-overlay.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .image-preview-hint {
+      color: rgba(245, 245, 245, 0.7);
+      font-size: 14px;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .image-preview-container {
+      max-width: 90%;
+      max-height: 70vh;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .image-preview-container img {
+      display: block;
+      max-width: 100%;
+      max-height: 70vh;
+      object-fit: contain;
+    }
+
+    .image-preview-close {
+      margin-top: 20px;
+      padding: 12px 32px;
+      background: rgba(245, 245, 245, 0.1);
+      border-radius: 100px;
+      color: #F5F5F5;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      transition: all 0.2s ease;
+    }
+
+    .image-preview-close:hover {
+      background: rgba(245, 245, 245, 0.2);
+    }
+
+    /* Landing screen */
+    .landing-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: flex-start;
+      z-index: 100;
+      padding: 24px;
+       padding-top: calc((var(--font-ui)*2) + 48px); 
+      transition: opacity 0.6s ease-out;
+    }
+
+    .landing-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+   
+
+    .landing-text {
+     font-size: var(--font-large);
+      line-height: 0.94em;
+      letter-spacing: -0.04em;
+      color: #2D2D2D;
+      margin-bottom: 24px;
+      font-weight: 500;
+    }
+
+    .landing-status {
+      font-size: var(--font-ui);
+      line-height: 0.94em;
+      letter-spacing: -0.04em;
+      color: #2D2D2D;
+      font-weight: 500;
+    }
+
+    /* Loading screen */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: flex-start;
+      z-index: 99;
+      padding: 24px;
+       padding-top: calc((var(--font-ui)*2) + 48px); 
+      transition: opacity 0.6s ease-out;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loading-overlay.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .loading-content {
+      max-width: 100%;
+    }
+
+    .loading-description {
+      font-size: var(--font-medium);
+      line-height: 1.15;
+      color: rgba(45, 45, 45, 1);
+      margin-bottom: 0.5em;
+      font-weight: 500;
+    }
+
+    .loading-status {
+      font-size: var(--font-medium);
+      line-height: 1.15;
+      color: #F5F5F5;
+      font-weight: 500;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    /* Info panel */
+    .info-panel {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      z-index: 150;
+      padding: 24px;
+      padding-top: calc((var(--font-ui)*2) + 48px);
+      padding-bottom: 100px;
+      transition: opacity 0.4s ease-out;
+      opacity: 0;
+      pointer-events: none;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .info-panel.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .info-content {
+      max-width: 100%;
+    }
+
+    .info-content p {
+      font-size: var(--font-small);
+      line-height: 0.94em;
+      letter-spacing: -0.04em;
+      color: #2D2D2D;
+      margin-bottom: 0.7em;
+      font-weight: 500;
+    }
+
+
+    .info-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 1em;
+      flex-wrap: wrap;
+    }
+
+    /* .info-btn {
+      padding: 7px 14px;
+      height: auto;
+      text-decoration: none;
+    } */
+
+    .contributors-title {
+      font-size: var(--font-small) !important;
+      margin-bottom: 24px !important;
+    }
+
+    .contributors-list {
+       font-size: var(--font-large) !important;
+      color: #F5F5F5 !important;
+    }
+
+    /* Help panel */
+    .help-panel {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: flex-start;
+      z-index: 150;
+      padding: 24px;
+       padding-top: calc((var(--font-ui)*2) + 48px); 
+      transition: opacity 0.4s ease-out;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .help-panel.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .help-panel .text-block {
+      max-width: min(600px, 85vw);
+      padding-bottom: 24px;
+    }
+
+    /* Icon button states */
+    .icon-btn.active {
+      background: rgba(245, 245, 245, 0.9);
+      color: rgba(45, 45, 45, 1);
+    }
+
+    /* Arrow button home state */
+    .arrow-button .arrow-icon {
+      display: block;
+      font-weight: 500 !important;
+    }
+
+    .arrow-button .home-icon {
+      display: none;
+    }
+
+    .arrow-button.show-home .arrow-icon {
+      display: none;
+    }
+
+    .arrow-button.show-home .home-icon {
+      display: block;
+    }
+
+    /* Hide content until loaded */
+    .content-hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .content-visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    main {
+      transition: opacity 0.6s ease-out;
+    }
+
+    .lock-indicator {
+      position: fixed;
+      bottom: 80px;
+      left: 24px;
+      font-size: 11px;
+      color: rgba(245, 245, 245, 0.4);
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      z-index: 10;
+    }
+
+    
+
+    @media (max-width: 600px) {
+      
+      .icon-buttons {
+        gap: 8px;
+      }
+      .icon-btn {
+        width: 50px;
+        height: 50px;
+        font-size: var(--font-btn);
+      }
+      
+      .effect-selector {
+        left: 80px;
+      }
+      .lock-indicator {
+        font-size: 10px;
+      }
+      .modal {
+        padding: 24px;
+      }
+    }
+
+    /* Desktop layout - must come after base styles */
+    @media (min-width: 1028px) {
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        max-width: 980px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+      header {
+        left: calc(50% - 490px);
+        right: calc(50% - 490px);
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+      .landing-screen {
+        padding-left: 0;
+        padding-right: 0;
+        justify-content: center;
+      }
+
+      .landing-content {
+        max-width: 980px;
+      }
+
+      .info-panel {
+        padding-left: 0;
+        padding-right: 0;
+        align-items: center;
+      }
+
+      .info-content {
+        max-width: 980px;
+        width: 100%;
+      }
+
+      .info-content p {
+        max-width: 980px;
+      }
+
+      .help-panel {
+        padding-left: 0;
+        padding-right: 0;
+        justify-content: center;
+      }
+
+      .help-panel .text-block {
+        max-width: 980px;
+      }
+
+      .submit-panel {
+        padding-left: 0;
+        padding-right: 0;
+        align-items: center;
+      }
+
+      .submit-content {
+        max-width: 980px;
+        width: 100%;
+      }
+
+      .submit-start-btn {
+        left: calc(50% - 490px);
+      }
+
+      .submit-next-btn {
+        right: calc(50% - 490px);
+      }
+
+      .arrow-button {
+        left: calc(50% - 490px);
+      }
+
+      .icon-buttons {
+        right: calc(50% - 490px);
+      }
+
+      .regen-button {
+        right: calc(50% - 490px);
+      }
+
+      .close-btn {
+        right: calc(50% - 490px);
+      }
+
+      .text-block, .loading-text {
+        font-size: var(--font-large);
+      }
+    }
+
+    /* Taller desktop screens - increase top/bottom spacing */
+    @media (min-height: 900px) and (min-width: 1028px) {
+      body {
+        padding-top: 48px;
+        padding-bottom: 48px;
+      }
+
+      header {
+        top: 48px;
+      }
+
+      .close-btn {
+        top: 48px;
+      }
+
+      .arrow-button {
+        bottom: 48px;
+      }
+
+      .icon-buttons {
+        bottom: 48px;
+      }
+
+      .save-button-container {
+        bottom: 48px;
+      }
+
+      .submit-next-btn,
+      .submit-start-btn {
+        bottom: 48px;
+      }
+
+      main,
+      .landing-screen,
+      .loading-overlay,
+      .info-panel,
+      .help-panel,
+      .submit-panel {
+          padding-top: calc((var(--font-ui)*2) + 52px); 
+      }
+
+      .info-panel,
+      .help-panel,
+      .submit-panel {
+        padding-bottom: 48px;
+      }
+    }
+
+    /* Larger screens - scale fonts up */
+    @media (min-width: 1500px) and (min-height: 900px) {
+      :root {
+        --font-large: 88px;
+        --font-medium: 53px;
+        --font-small: 40px;
+        --font-ui: 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Dynamic simplex noise background -->
+  <canvas id="bgCanvas"></canvas>
+
+  <!-- Camera video background -->
+  <video class="camera-video" id="cameraVideo" autoplay playsinline muted></video>
+  <canvas id="cameraCanvas"></canvas>
+  <div class="camera-overlay" id="cameraOverlay"></div>
+
+  <!-- SVG Filters for effects -->
+  <svg style="position: absolute; width: 0; height: 0;" aria-hidden="true">
+    <defs>
+      <filter id="water-distort" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="turbulence" baseFrequency="0.015 0.025" numOctaves="3" result="noise" seed="5"/>
+        <feDisplacementMap id="water-displace" in="SourceGraphic" in2="noise" scale="50" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <filter id="water-distort-subtle" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="turbulence" baseFrequency="0.02 0.03" numOctaves="2" result="noise" seed="8"/>
+        <feDisplacementMap id="water-displace-subtle" in="SourceGraphic" in2="noise" scale="25" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <!-- Splash/Liquid effect filter - pure distortion, no blend with source -->
+      <filter id="splash-distort" x="-100%" y="-100%" width="300%" height="300%">
+        <feTurbulence id="splash-turbulence" type="turbulence" baseFrequency="0.02 0.015" numOctaves="4" result="noise" seed="42"/>
+        <feDisplacementMap id="splash-displace" in="SourceGraphic" in2="noise" scale="300" xChannelSelector="R" yChannelSelector="G" result="displaced"/>
+        <feGaussianBlur id="splash-blur" in="displaced" stdDeviation="15"/>
+      </filter>
+      <filter id="splash-distort-dark" x="-100%" y="-100%" width="300%" height="300%">
+        <feTurbulence id="splash-turbulence-dark" type="turbulence" baseFrequency="0.025 0.02" numOctaves="3" result="noise" seed="99"/>
+        <feDisplacementMap id="splash-displace-dark" in="SourceGraphic" in2="noise" scale="250" xChannelSelector="R" yChannelSelector="G" result="displaced"/>
+        <feGaussianBlur id="splash-blur-dark" in="displaced" stdDeviation="12"/>
+      </filter>
+      <!-- Blur resolve effect filters -->
+      <filter id="blur-resolve" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur id="blur-resolve-amount" in="SourceGraphic" stdDeviation="20"/>
+      </filter>
+      <filter id="blur-resolve-dark" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur id="blur-resolve-dark-amount" in="SourceGraphic" stdDeviation="15"/>
+      </filter>
+      <!-- Choke effect filters -->
+      <filter id="choke-erode" x="-20%" y="-20%" width="140%" height="140%">
+        <feMorphology id="choke-erode-morph" operator="erode" radius="8"/>
+      </filter>
+      <filter id="choke-dilate" x="-20%" y="-20%" width="140%" height="140%">
+        <feMorphology id="choke-dilate-morph" operator="dilate" radius="6"/>
+      </filter>
+      <filter id="choke-erode-dark" x="-20%" y="-20%" width="140%" height="140%">
+        <feMorphology id="choke-erode-morph-dark" operator="erode" radius="6"/>
+      </filter>
+      <filter id="choke-dilate-dark" x="-20%" y="-20%" width="140%" height="140%">
+        <feMorphology id="choke-dilate-morph-dark" operator="dilate" radius="4"/>
+      </filter>
+    </defs>
+  </svg>
+
+  <!-- Landing screen -->
+  <div class="landing-screen" id="landingScreen">
+    <div class="landing-content">
+      <div class="landing-text">Crowd-sourced rituals inviting you to explore your outdoor surroundings in ways that are immediate, intimate, and unexpected.</div>
+      <div class="landing-status">Ritualising now...</div>
+    </div>
+  </div>
+
+  <!-- Loading overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+      <div class="loading-description">Crowd-sourced rituals inviting you to explore your surroundings in ways that are immediate, intimate, and unexpected.</div>
+      <div class="loading-status">Ritualising now.</div>
+    </div>
+  </div>
+
+  <!-- Info panel -->
+  <div class="info-panel" id="infoPanel">
+    <button class="btn-round btn-light close-btn visible" id="closeButtonInfo">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M17.2809 19.4464C17.8789 20.0444 18.8484 20.0444 19.4464 19.4464C20.0444 18.8485 20.0444 17.8789 19.4464 17.2809L6.45335 4.28785C5.85536 3.68986 4.88583 3.68986 4.28784 4.28785C3.68985 4.88584 3.68985 5.85537 4.28784 6.45336L17.2809 19.4464Z" fill="white"/>
+        <path d="M19.4464 6.45345C20.0444 5.85546 20.0444 4.88593 19.4464 4.28794C18.8485 3.68995 17.8789 3.68995 17.2809 4.28794L4.28785 17.281C3.68986 17.879 3.68986 18.8485 4.28785 19.4465C4.88584 20.0445 5.85537 20.0445 6.45336 19.4465L19.4464 6.45345Z" fill="white"/>
+      </svg>
+    </button>
+    <div class="info-content">
+      <p>The Ritual Randomiser has been developed as part of Accept & Proceed’s wider explorations in how outdoor culture is changing — a piece of work called Beyond the Beaten Path.</p>
+      <p>Each ritual draws from a growing ecosystem of perspectives, collected from the communities it touches. Ways of seeing and being in the world, recombined to reveal it in surprising light.</p>
+      <p>Access Beyond the Beaten Path here:</p>
+      <div class="info-buttons">
+        <a href="https://www.figma.com/proto/aNnbGPTxeUglhw3UQaZSN0/Beyond-The-Beaten-Path?page-id=0%3A1&node-id=1-31&p=f&viewport=-2060%2C83%2C0.1&t=ADSiJqGToNITnzkY-1&scaling=scale-down-width&content-scaling=fixed" target="_blank" class="btn-pill btn-light info-btn">Full Report</a>
+        <button class="btn-pill btn-light info-btn" id="contributorsButton">Contributors</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contributors panel -->
+  <div class="info-panel" id="contributorsPanel">
+    <button class="btn-round btn-light close-btn visible" id="closeButtonContrib">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M17.2809 19.4464C17.8789 20.0444 18.8484 20.0444 19.4464 19.4464C20.0444 18.8485 20.0444 17.8789 19.4464 17.2809L6.45335 4.28785C5.85536 3.68986 4.88583 3.68986 4.28784 4.28785C3.68985 4.88584 3.68985 5.85537 4.28784 6.45336L17.2809 19.4464Z" fill="white"/>
+        <path d="M19.4464 6.45345C20.0444 5.85546 20.0444 4.88593 19.4464 4.28794C18.8485 3.68995 17.8789 3.68995 17.2809 4.28794L4.28785 17.281C3.68986 17.879 3.68986 18.8485 4.28785 19.4465C4.88584 20.0445 5.85537 20.0445 6.45336 19.4465L19.4464 6.45345Z" fill="white"/>
+      </svg>
+    </button>
+    <div class="info-content">
+      <p class="contributors-title">Thank you to our Contributors</p>
+      <p class="contributors-list" id="contributorsList"></p>
+    </div>
+  </div>
+
+  <!-- Help panel -->
+  <div class="help-panel" id="helpPanel">
+    <div class="text-block">
+      <div class="row row-left"><span class="word highlight">Visit</span> <span class="word dark">[a generic outdoor space]</span></div>
+      <div class="row row-right"><span class="word dark">Take a</span> <span class="word highlight">moment</span> <span class="word dark">to [an activity unusual to your day to day]</span></div>
+      <div class="row row-left"><span class="word highlight">focus</span> <span class="word dark">on [specific details, sounds, textures]</span></div>
+    </div>
+  </div>
+
+  <header>
+    <div class="header-title" id="headerTitle"></div>
+    <div class="header-sub" id="headerSub"></div>
+  </header>
+
+  <main class="content-hidden" id="mainContent">
+    <div class="text-block" id="textBlock">
+      <div class="row row-left" id="row1"></div>
+      <div class="row row-right" id="row2"></div>
+      <div class="row row-left" id="row3"></div>
+    </div>
+
+  </main>
+
+  <!-- Submit button (bottom left) -->
+  <button class="btn-pill arrow-button visible" id="arrowButton">
+    <span class="arrow-icon">Submit</span>
+    <span class="home-icon">⌂</span>
+  </button>
+
+  <div class="save-button-container">
+      <button class="btn-round  save-button" id="saveButton">
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25" fill="none">
+          <path d="M12.0555 1.55554L12.0555 17.1111M12.0555 17.1111L17.8888 11.2777M12.0555 17.1111L6.22217 11.2777" stroke="white" stroke-width="2.72222" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M20.2222 22.5555H3.88884" stroke="white" stroke-width="2.72222" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+      </button>
+    </div>
+
+  <!-- Regen button (top right) -->
+  <button class="btn-round regen-button" id="regenButton">↻</button>
+
+  <!-- Icon buttons (bottom right) -->
+  <div class="icon-buttons">
+    <button class="btn-round icon-btn" id="previewButton">
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25" fill="none">
+            <path d="M8.97363 1.16699H15.0635C16.1832 1.16699 17.0916 2.07463 17.0918 3.19434C17.0918 4.29067 17.9808 5.17969 19.0771 5.17969H19.7119C20.77 5.17969 21.5117 5.59226 22.0156 6.23047C22.5441 6.89994 22.8711 7.9009 22.8711 9.11621V16.709C22.871 18.8153 21.2165 20.5344 19.1367 20.6396L18.9346 20.6445L12.0186 20.6455H5.10254C2.92921 20.6454 1.16705 18.8833 1.16699 16.709V9.11621C1.16699 7.9006 1.493 6.89985 2.02148 6.23047C2.52552 5.59212 3.26728 5.17969 4.3252 5.17969H4.95996C6.0563 5.17969 6.94531 4.29067 6.94531 3.19434C6.94551 2.07463 7.85388 1.16699 8.97363 1.16699Z" stroke="white" stroke-width="2.33333" stroke-miterlimit="10"/>
+            <path d="M12.0186 7.97632C14.3153 7.97632 16.1776 9.8378 16.1777 12.1345C16.1777 14.4314 14.3154 16.2937 12.0186 16.2937C9.72184 16.2935 7.86035 14.4313 7.86035 12.1345C7.86051 9.8379 9.72193 7.97648 12.0186 7.97632Z" stroke="white" stroke-width="2.33333" stroke-miterlimit="10"/>
+          </svg>
+        </button>
+        <button class="btn-round icon-btn" id="infoButton">
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25" fill="none">
+      <g clip-path="url(#clip0_286_237)">
+        <circle cx="12.0558" cy="2.72228" r="1.94444" fill="white"/>
+        <line x1="12.056" y1="10.1112" x2="12.056" y2="22.5557" stroke="white" stroke-width="3.11111" stroke-linecap="round"/>
+      </g>
+      <defs>
+        <clipPath id="clip0_286_237">
+          <rect width="24.1111" height="24.1111" fill="white"/>
+        </clipPath>
+      </defs>
+    </svg>
+    </button>
+  </div>
+
+  <div class="lock-indicator content-hidden" id="lockIndicator"></div>
+
+  <!-- Effect selector (hidden) -->
+  <div class="effect-selector" id="effectSelector" style="display: none;">
+    <span class="effect-label">Effect</span>
+    <div class="effect-buttons" id="effectButtons">
+      <button class="effect-btn active" data-effect="1">1</button>
+      <button class="effect-btn" data-effect="2">2</button>
+      <button class="effect-btn" data-effect="3">3</button>
+      <button class="effect-btn" data-effect="4">4</button>
+    </div>
+  </div>
+  <div class="flash-overlay" id="flashOverlay"></div>
+
+  <!-- Image preview for mobile save -->
+  <div class="image-preview-overlay" id="imagePreviewOverlay">
+    <div class="image-preview-hint">Hold the image to save to your photo roll</div>
+    <div class="image-preview-container">
+      <img id="imagePreview" src="" alt="Ritual">
+    </div>
+    <button class="image-preview-close" id="imagePreviewClose">Done</button>
+  </div>
+
+  <!-- Submit panels -->
+  <!-- Step 1: Intro -->
+  <div class="submit-panel" id="submitStep1">
+    <button class="btn-round btn-light close-btn visible" id="closeSubmit1">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M17.2809 19.4464C17.8789 20.0444 18.8484 20.0444 19.4464 19.4464C20.0444 18.8485 20.0444 17.8789 19.4464 17.2809L6.45335 4.28785C5.85536 3.68986 4.88583 3.68986 4.28784 4.28785C3.68985 4.88584 3.68985 5.85537 4.28784 6.45336L17.2809 19.4464Z" fill="white"/>
+        <path d="M19.4464 6.45345C20.0444 5.85546 20.0444 4.88593 19.4464 4.28794C18.8485 3.68995 17.8789 3.68995 17.2809 4.28794L4.28785 17.281C3.68986 17.879 3.68986 18.8485 4.28785 19.4465C4.88584 20.0445 5.85537 20.0445 6.45336 19.4465L19.4464 6.45345Z" fill="white"/>
+      </svg>
+    </button>
+    <div class="submit-content">
+      <p class="submit-intro-text">Please contribute a ritual of your own to help grow the randomiser</p>
+    </div>
+    <button class="btn-pill submit-start-btn" id="submitStartBtn">Next</button>
+  </div>
+
+  <!-- Step 2: Location -->
+  <div class="submit-panel" id="submitStep2">
+    <button class="btn-round btn-light close-btn visible" id="closeSubmit2">✕</button>
+    <div class="submit-content">
+      <div class="submit-input-area">
+        <div class="submit-text-wrapper">
+          <span class="submit-prefix highlight">Visit </span><span class="submit-input" id="submitInput2" contenteditable="true" data-placeholder="a generic outdoor space"></span>
+        </div>
+      </div>
+      <div class="submit-footer">
+        <span class="submit-label">Suggest a location</span>
+        <span class="submit-counter"><span id="counter2">0</span>/32</span>
+      </div>
+    </div>
+    <button class="btn-round submit-next-btn" id="submitNext2">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25" fill="none">
+        <path d="M1.55518 12.0556L22.5552 12.0556M22.5552 12.0556L16.7218 6.22228M22.5552 12.0556L16.7218 17.8889" stroke="white" stroke-width="2.72222" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Step 3: Moment -->
+  <div class="submit-panel" id="submitStep3">
+    <button class="btn-round btn-light close-btn visible" id="closeSubmit3">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M17.2809 19.4464C17.8789 20.0444 18.8484 20.0444 19.4464 19.4464C20.0444 18.8485 20.0444 17.8789 19.4464 17.2809L6.45335 4.28785C5.85536 3.68986 4.88583 3.68986 4.28784 4.28785C3.68985 4.88584 3.68985 5.85537 4.28784 6.45336L17.2809 19.4464Z" fill="white"/>
+        <path d="M19.4464 6.45345C20.0444 5.85546 20.0444 4.88593 19.4464 4.28794C18.8485 3.68995 17.8789 3.68995 17.2809 4.28794L4.28785 17.281C3.68986 17.879 3.68986 18.8485 4.28785 19.4465C4.88584 20.0445 5.85537 20.0445 6.45336 19.4465L19.4464 6.45345Z" fill="white"/>
+      </svg>
+    </button>
+    <div class="submit-content">
+      <div class="submit-input-area">
+        <div class="submit-text-wrapper">
+          <span class="submit-prefix">Take a </span><span class="submit-prefix highlight">moment </span><span class="submit-input" id="submitInput3" contenteditable="true" data-placeholder="an activity unusual to your day to day,"></span>
+        </div>
+      </div>
+      <div class="submit-footer">
+        <span class="submit-label">Suggest a moment</span>
+        <span class="submit-counter"><span id="counter3">0</span>/32</span>
+      </div>
+    </div>
+    <button class="btn-round submit-next-btn" id="submitNext3">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25" fill="none">
+        <path d="M1.55518 12.0556L22.5552 12.0556M22.5552 12.0556L16.7218 6.22228M22.5552 12.0556L16.7218 17.8889" stroke="white" stroke-width="2.72222" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Step 4: Focus -->
+  <div class="submit-panel" id="submitStep4">
+    <button class="btn-round btn-light close-btn visible" id="closeSubmit4">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M17.2809 19.4464C17.8789 20.0444 18.8484 20.0444 19.4464 19.4464C20.0444 18.8485 20.0444 17.8789 19.4464 17.2809L6.45335 4.28785C5.85536 3.68986 4.88583 3.68986 4.28784 4.28785C3.68985 4.88584 3.68985 5.85537 4.28784 6.45336L17.2809 19.4464Z" fill="white"/>
+        <path d="M19.4464 6.45345C20.0444 5.85546 20.0444 4.88593 19.4464 4.28794C18.8485 3.68995 17.8789 3.68995 17.2809 4.28794L4.28785 17.281C3.68986 17.879 3.68986 18.8485 4.28785 19.4465C4.88584 20.0445 5.85537 20.0445 6.45336 19.4465L19.4464 6.45345Z" fill="white"/>
+      </svg>
+    </button>
+    <div class="submit-content">
+      <div class="submit-input-area">
+        <div class="submit-text-wrapper">
+          <span class="submit-prefix highlight">focus </span><span class="submit-input" id="submitInput4" contenteditable="true" data-placeholder="on specific details, sounds, textures of the outdoors."></span>
+        </div>
+      </div>
+      <div class="submit-footer">
+        <span class="submit-label">Suggest a focus</span>
+        <span class="submit-counter"><span id="counter4">0</span>/32</span>
+      </div>
+    </div>
+    <button class="btn-round submit-next-btn" id="submitNext4">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25" fill="none">
+        <path d="M1.55518 12.0556L22.5552 12.0556M22.5552 12.0556L16.7218 6.22228M22.5552 12.0556L16.7218 17.8889" stroke="white" stroke-width="2.72222" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Step 5: Contributor -->
+  <div class="submit-panel" id="submitStep5">
+    <button class="btn-round btn-light close-btn visible" id="closeSubmit5">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M17.2809 19.4464C17.8789 20.0444 18.8484 20.0444 19.4464 19.4464C20.0444 18.8485 20.0444 17.8789 19.4464 17.2809L6.45335 4.28785C5.85536 3.68986 4.88583 3.68986 4.28784 4.28785C3.68985 4.88584 3.68985 5.85537 4.28784 6.45336L17.2809 19.4464Z" fill="white"/>
+        <path d="M19.4464 6.45345C20.0444 5.85546 20.0444 4.88593 19.4464 4.28794C18.8485 3.68995 17.8789 3.68995 17.2809 4.28794L4.28785 17.281C3.68986 17.879 3.68986 18.8485 4.28785 19.4465C4.88584 20.0445 5.85537 20.0445 6.45336 19.4465L19.4464 6.45345Z" fill="white"/>
+      </svg>
+    </button>
+    <div class="submit-content">
+      <div class="submit-input-area">
+        <div class="submit-text-wrapper">
+          <span class="submit-prefix">Contributor </span><span class="submit-input" id="submitInput5" contenteditable="true" data-placeholder="add your name if you want to be credited"></span>
+        </div>
+      </div>
+      <div class="submit-footer">
+        <span class="submit-label">Become a contributor</span>
+        <span class="submit-counter"><span id="counter5">0</span>/32</span>
+      </div>
+    </div>
+    <button class="btn-round submit-next-btn" id="submitNext5">
+      <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25" fill="none">
+        <path d="M1.55518 12.0556L22.5552 12.0556M22.5552 12.0556L16.7218 6.22228M22.5552 12.0556L16.7218 17.8889" stroke="white" stroke-width="2.72222" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Step 6: Thank you -->
+  <div class="submit-panel" id="submitStep6">
+    <button class="btn-round btn-light close-btn visible" id="closeSubmit6">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M17.2809 19.4464C17.8789 20.0444 18.8484 20.0444 19.4464 19.4464C20.0444 18.8485 20.0444 17.8789 19.4464 17.2809L6.45335 4.28785C5.85536 3.68986 4.88583 3.68986 4.28784 4.28785C3.68985 4.88584 3.68985 5.85537 4.28784 6.45336L17.2809 19.4464Z" fill="white"/>
+        <path d="M19.4464 6.45345C20.0444 5.85546 20.0444 4.88593 19.4464 4.28794C18.8485 3.68995 17.8789 3.68995 17.2809 4.28794L4.28785 17.281C3.68986 17.879 3.68986 18.8485 4.28785 19.4465C4.88584 20.0445 5.85537 20.0445 6.45336 19.4465L19.4464 6.45345Z" fill="white"/>
+      </svg>
+    </button>
+    <div class="submit-content">
+      <p class="submit-final-text">Now Go Outside</p>
+    </div>
+  </div>
+
+  <script>
+    // ===========================================
+    // DYNAMIC BACKGROUND - SIMPLEX NOISE
+    // ===========================================
+
+    // Simplex noise implementation (based on Stefan Gustavson's work)
+    const SimplexNoise = (function() {
+      const F2 = 0.5 * (Math.sqrt(3) - 1);
+      const G2 = (3 - Math.sqrt(3)) / 6;
+
+      const grad3 = [
+        [1,1,0],[-1,1,0],[1,-1,0],[-1,-1,0],
+        [1,0,1],[-1,0,1],[1,0,-1],[-1,0,-1],
+        [0,1,1],[0,-1,1],[0,1,-1],[0,-1,-1]
+      ];
+
+      function createNoise(seed = Math.random() * 256) {
+        const perm = new Uint8Array(512);
+        const p = new Uint8Array(256);
+
+        for (let i = 0; i < 256; i++) p[i] = i;
+
+        // Shuffle using seed
+        let n = seed;
+        for (let i = 255; i > 0; i--) {
+          n = (n * 16807) % 2147483647;
+          const j = n % (i + 1);
+          [p[i], p[j]] = [p[j], p[i]];
+        }
+
+        for (let i = 0; i < 512; i++) perm[i] = p[i & 255];
+
+        return function noise2D(x, y) {
+          let s = (x + y) * F2;
+          let i = Math.floor(x + s);
+          let j = Math.floor(y + s);
+          let t = (i + j) * G2;
+          let X0 = i - t;
+          let Y0 = j - t;
+          let x0 = x - X0;
+          let y0 = y - Y0;
+
+          let i1, j1;
+          if (x0 > y0) { i1 = 1; j1 = 0; }
+          else { i1 = 0; j1 = 1; }
+
+          let x1 = x0 - i1 + G2;
+          let y1 = y0 - j1 + G2;
+          let x2 = x0 - 1 + 2 * G2;
+          let y2 = y0 - 1 + 2 * G2;
+
+          let ii = i & 255;
+          let jj = j & 255;
+          let gi0 = perm[ii + perm[jj]] % 12;
+          let gi1 = perm[ii + i1 + perm[jj + j1]] % 12;
+          let gi2 = perm[ii + 1 + perm[jj + 1]] % 12;
+
+          let n0 = 0, n1 = 0, n2 = 0;
+
+          let t0 = 0.5 - x0*x0 - y0*y0;
+          if (t0 >= 0) {
+            t0 *= t0;
+            n0 = t0 * t0 * (grad3[gi0][0]*x0 + grad3[gi0][1]*y0);
+          }
+
+          let t1 = 0.5 - x1*x1 - y1*y1;
+          if (t1 >= 0) {
+            t1 *= t1;
+            n1 = t1 * t1 * (grad3[gi1][0]*x1 + grad3[gi1][1]*y1);
+          }
+
+          let t2 = 0.5 - x2*x2 - y2*y2;
+          if (t2 >= 0) {
+            t2 *= t2;
+            n2 = t2 * t2 * (grad3[gi2][0]*x2 + grad3[gi2][1]*y2);
+          }
+
+          // Return value in range [-1, 1]
+          return 70 * (n0 + n1 + n2);
+        };
+      }
+
+      return { createNoise };
+    })();
+
+    // 12-hour color palette (loops twice per day)
+    const COLOR_PALETTE = [
+      { black: [0x21, 0x9E, 0xBC], white: [0xF2, 0xB7, 0x05] }, // Hour 1: Teal / Gold
+      { black: [0x3A, 0x86, 0xFF], white: [0xE3, 0x64, 0x14] }, // Hour 2: Blue / Orange
+      { black: [0x1F, 0x4F, 0xD8], white: [0xE0, 0x3A, 0x1F] }, // Hour 3: Deep Blue / Red
+      { black: [0x40, 0x1D, 0xB2], white: [0xC8, 0x1D, 0x4A] }, // Hour 4: Purple / Magenta
+      { black: [0xC8, 0x1D, 0x4A], white: [0x3A, 0x1B, 0x9E] }, // Hour 5: Magenta / Deep Purple
+      { black: [0xE0, 0x3A, 0x1F], white: [0x1F, 0x4F, 0xD8] }, // Hour 6: Red / Deep Blue
+      { black: [0xE3, 0x64, 0x14], white: [0x3A, 0x86, 0xFF] }, // Hour 7: Orange / Blue
+      { black: [0xF2, 0xB7, 0x05], white: [0x21, 0x9E, 0xBC] }, // Hour 8: Gold / Teal
+      { black: [0x8A, 0xC9, 0x26], white: [0x75, 0x36, 0xD9] }, // Hour 9: Lime / Violet
+      { black: [0x5F, 0xB7, 0x09], white: [0xA0, 0x48, 0xF6] }, // Hour 10: Green / Purple
+      { black: [0x2C, 0xB6, 0x7D], white: [0xD3, 0x49, 0x82] }, // Hour 11: Teal Green / Pink
+      { black: [0x1B, 0x9E, 0x77], white: [0xE4, 0x61, 0x88] }  // Hour 12: Sea Green / Rose
+    ];
+
+    // Background state
+    const bgCanvas = document.getElementById('bgCanvas');
+    const bgCtx = bgCanvas.getContext('2d');
+    let bgNoise = SimplexNoise.createNoise(42); // Fixed seed for consistent pattern
+    let lastBgUpdate = 0;
+    let currentBgImageData = null;
+    let targetBgImageData = null;
+    let bgTransitionProgress = 1;
+
+    // Get colors for current time with smooth interpolation
+    function getTimeColors() {
+      const now = new Date();
+      const hours = now.getHours() % 12; // 0-11 (loops twice per day)
+      const minutes = now.getMinutes();
+      const seconds = now.getSeconds();
+
+      // Calculate blend factor (0-1) based on minutes and seconds
+      const blend = (minutes * 60 + seconds) / 3600;
+
+      const currentPalette = COLOR_PALETTE[hours];
+      const nextPalette = COLOR_PALETTE[(hours + 1) % 12];
+
+      // Interpolate between current and next hour's colors
+      const blackColor = [
+        Math.round(currentPalette.black[0] + (nextPalette.black[0] - currentPalette.black[0]) * blend),
+        Math.round(currentPalette.black[1] + (nextPalette.black[1] - currentPalette.black[1]) * blend),
+        Math.round(currentPalette.black[2] + (nextPalette.black[2] - currentPalette.black[2]) * blend)
+      ];
+
+      const whiteColor = [
+        Math.round(currentPalette.white[0] + (nextPalette.white[0] - currentPalette.white[0]) * blend),
+        Math.round(currentPalette.white[1] + (nextPalette.white[1] - currentPalette.white[1]) * blend),
+        Math.round(currentPalette.white[2] + (nextPalette.white[2] - currentPalette.white[2]) * blend)
+      ];
+
+      return { blackColor, whiteColor };
+    }
+
+    // Generate the background at low resolution for performance
+    function generateBackground() {
+      const scale = 8; // Render at 1/8 resolution for blur effect
+      const w = Math.ceil(window.innerWidth / scale);
+      const h = Math.ceil(window.innerHeight / scale);
+
+      // Resize canvas if needed
+      if (bgCanvas.width !== window.innerWidth || bgCanvas.height !== window.innerHeight) {
+        bgCanvas.width = window.innerWidth;
+        bgCanvas.height = window.innerHeight;
+      }
+
+      // Create small canvas for noise generation
+      const smallCanvas = document.createElement('canvas');
+      smallCanvas.width = w;
+      smallCanvas.height = h;
+      const smallCtx = smallCanvas.getContext('2d');
+      const imageData = smallCtx.createImageData(w, h);
+      const data = imageData.data;
+
+      const { blackColor, whiteColor } = getTimeColors();
+
+      // Noise parameters - scale based on reference size for consistent look across devices
+      const referenceSize = 390; // Mobile width as reference
+      const scaleFactor = referenceSize / Math.min(window.innerWidth, window.innerHeight);
+      const noiseScale = 0.008 * scaleFactor; // Adjusted for consistent blob size
+
+      // Generate noise and map to colors (static, no movement)
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          // Multi-octave noise for more organic look
+          let noiseVal = 0;
+          noiseVal += bgNoise(x * noiseScale, y * noiseScale) * 0.6;
+          noiseVal += bgNoise(x * noiseScale * 2, y * noiseScale * 2) * 0.3;
+          noiseVal += bgNoise(x * noiseScale * 4, y * noiseScale * 4) * 0.1;
+
+          // Normalize to 0-1 with contrast boost
+          let t = (noiseVal + 1) / 2;
+          // Strong contrast boost to match webcam intensity
+          // Apply S-curve multiple times for stronger effect
+          t = t * t * (3 - 2 * t);
+          t = t * t * (3 - 2 * t);
+          t = t * t * (3 - 2 * t);
+
+          // Map to colors
+          const idx = (y * w + x) * 4;
+          data[idx] = blackColor[0] + (whiteColor[0] - blackColor[0]) * t;
+          data[idx + 1] = blackColor[1] + (whiteColor[1] - blackColor[1]) * t;
+          data[idx + 2] = blackColor[2] + (whiteColor[2] - blackColor[2]) * t;
+          data[idx + 3] = 255;
+        }
+      }
+
+      smallCtx.putImageData(imageData, 0, 0);
+
+      // Draw to main canvas with smoothing (creates blur effect)
+      bgCtx.imageSmoothingEnabled = true;
+      bgCtx.imageSmoothingQuality = 'high';
+      bgCtx.drawImage(smallCanvas, 0, 0, bgCanvas.width, bgCanvas.height);
+
+      // Add pixel noise overlay
+      addPixelNoise();
+    }
+
+    // Static noise pattern (generated once)
+    let staticNoisePattern = null;
+    let noisePatternWidth = 0;
+    let noisePatternHeight = 0;
+
+    // Generate static noise pattern once
+    function generateStaticNoise(w, h) {
+      if (staticNoisePattern && noisePatternWidth === w && noisePatternHeight === h) {
+        return; // Already generated for this size
+      }
+      noisePatternWidth = w;
+      noisePatternHeight = h;
+      staticNoisePattern = new Float32Array(w * h);
+      const noiseIntensity = 12;
+      for (let i = 0; i < staticNoisePattern.length; i++) {
+        staticNoisePattern[i] = (Math.random() - 0.5) * noiseIntensity;
+      }
+    }
+
+    // Add consistent pixel noise regardless of screen size
+    function addPixelNoise() {
+      const w = bgCanvas.width;
+      const h = bgCanvas.height;
+
+      // Generate static noise if needed
+      generateStaticNoise(w, h);
+
+      const imageData = bgCtx.getImageData(0, 0, w, h);
+      const data = imageData.data;
+
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          const pixelIndex = y * w + x;
+          const dataIndex = pixelIndex * 4;
+          const noise = staticNoisePattern[pixelIndex];
+          data[dataIndex] = Math.max(0, Math.min(255, data[dataIndex] + noise));
+          data[dataIndex + 1] = Math.max(0, Math.min(255, data[dataIndex + 1] + noise));
+          data[dataIndex + 2] = Math.max(0, Math.min(255, data[dataIndex + 2] + noise));
+        }
+      }
+
+      bgCtx.putImageData(imageData, 0, 0);
+    }
+
+    // Initialize and set up updates
+    function initBackground() {
+      generateBackground();
+
+      // Update every 60 seconds for color transitions (time-based palette)
+      setInterval(generateBackground, 60000);
+
+      // Update on resize
+      window.addEventListener('resize', () => {
+        generateBackground();
+      });
+    }
+
+    // Start background immediately
+    initBackground();
+
+    // ===========================================
+    // CAMERA COLOR PROCESSING
+    // ===========================================
+
+    const cameraCanvas = document.getElementById('cameraCanvas');
+    const cameraCtx = cameraCanvas.getContext('2d');
+    let cameraAnimationId = null;
+    let cameraProcessingActive = false;
+    let lastCameraFrame = 0;
+    const cameraFrameInterval = 50; // ~20fps to reduce CPU load
+    let smallCanvasCache = null;
+    let smallCtxCache = null;
+    let prevFrameCanvas = null;
+    let prevFrameCtx = null;
+    let tempFrameCanvas = null;
+    let tempFrameCtx = null;
+    const frameBlendAmount = 0.4; // How much of new frame to show (lower = smoother transitions)
+
+    // Process camera frame with time-based color mapping (matches save image exactly)
+    function processCameraFrame(video, timestamp) {
+      if (!cameraProcessingActive) return;
+
+      // Throttle to ~20fps
+      if (timestamp - lastCameraFrame < cameraFrameInterval) {
+        cameraAnimationId = requestAnimationFrame((ts) => processCameraFrame(video, ts));
+        return;
+      }
+      lastCameraFrame = timestamp;
+
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const blurAmount = 25; // Lower = more blur (matches save image)
+
+      // Resize canvas if needed
+      if (cameraCanvas.width !== width || cameraCanvas.height !== height) {
+        cameraCanvas.width = width;
+        cameraCanvas.height = height;
+      }
+
+      // Calculate cover dimensions for video
+      const videoRatio = video.videoWidth / video.videoHeight;
+      const canvasRatio = width / height;
+      let drawWidth, drawHeight, offsetX, offsetY;
+
+      if (videoRatio > canvasRatio) {
+        drawHeight = height * 1.15;
+        drawWidth = drawHeight * videoRatio;
+        offsetX = (width - drawWidth) / 2;
+        offsetY = (height - drawHeight) / 2;
+      } else {
+        drawWidth = width * 1.15;
+        drawHeight = drawWidth / videoRatio;
+        offsetX = (width - drawWidth) / 2;
+        offsetY = (height - drawHeight) / 2;
+      }
+
+      // Step 1: Downscale for blur (Safari compatible)
+      const smallWidth = Math.floor(width / blurAmount);
+      const smallHeight = Math.floor(height / blurAmount);
+
+      // Reuse cached canvas to avoid GC
+      if (!smallCanvasCache || smallCanvasCache.width !== smallWidth || smallCanvasCache.height !== smallHeight) {
+        smallCanvasCache = document.createElement('canvas');
+        smallCanvasCache.width = smallWidth;
+        smallCanvasCache.height = smallHeight;
+        smallCtxCache = smallCanvasCache.getContext('2d');
+        smallCtxCache.imageSmoothingEnabled = true;
+        smallCtxCache.imageSmoothingQuality = 'high';
+      }
+      const smallCanvas = smallCanvasCache;
+      const smallCtx = smallCtxCache;
+
+      // Draw video to small canvas (downscale) - apply cover scaling
+      const scaleX = smallWidth / width;
+      const scaleY = smallHeight / height;
+      smallCtx.drawImage(video,
+        offsetX * scaleX, offsetY * scaleY,
+        drawWidth * scaleX, drawHeight * scaleY);
+
+      // Multiple blur passes for smoother result
+      for (let i = 0; i < 10; i++) {
+        smallCtx.drawImage(smallCanvas, 0, 0, smallWidth, smallHeight);
+      }
+
+      // Step 2: Upscale to full resolution (creates blur effect)
+      cameraCtx.imageSmoothingEnabled = true;
+      cameraCtx.imageSmoothingQuality = 'high';
+      // Apply canvas filter blur to smooth pixelated edges
+      cameraCtx.filter = 'blur(30px)';
+      cameraCtx.drawImage(smallCanvas, 0, 0, width, height);
+      cameraCtx.filter = 'none';
+
+      // Step 3: Apply color mapping at full resolution (same as save image)
+      const imageData = cameraCtx.getImageData(0, 0, width, height);
+      const data = imageData.data;
+      const { blackColor, whiteColor } = getTimeColors();
+
+      for (let i = 0; i < data.length; i += 4) {
+        // Convert to grayscale (luminance)
+        const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+        let t = gray / 255;
+
+        // Softer contrast - blend S-curve with linear for gentler effect
+        const curved = t * t * (3 - 2 * t);
+        t = t * 0.6 + curved * 0.4;
+
+        // Map grayscale to time-based colors
+        data[i] = blackColor[0] + (whiteColor[0] - blackColor[0]) * t;
+        data[i + 1] = blackColor[1] + (whiteColor[1] - blackColor[1]) * t;
+        data[i + 2] = blackColor[2] + (whiteColor[2] - blackColor[2]) * t;
+      }
+      cameraCtx.putImageData(imageData, 0, 0);
+
+      // Step 4: Add pixel noise (same as save image)
+      const noiseData = cameraCtx.getImageData(0, 0, width, height);
+      const nData = noiseData.data;
+      for (let i = 0; i < nData.length; i += 4) {
+        const noise = (Math.random() - 0.5) * 12;
+        nData[i] = Math.max(0, Math.min(255, nData[i] + noise));
+        nData[i + 1] = Math.max(0, Math.min(255, nData[i + 1] + noise));
+        nData[i + 2] = Math.max(0, Math.min(255, nData[i + 2] + noise));
+      }
+      cameraCtx.putImageData(noiseData, 0, 0);
+
+      // Step 5: Blend with previous frame for smoother transitions
+      // Initialize/resize canvases if needed
+      if (!prevFrameCanvas || prevFrameCanvas.width !== width || prevFrameCanvas.height !== height) {
+        prevFrameCanvas = document.createElement('canvas');
+        prevFrameCanvas.width = width;
+        prevFrameCanvas.height = height;
+        prevFrameCtx = prevFrameCanvas.getContext('2d');
+        tempFrameCanvas = document.createElement('canvas');
+        tempFrameCanvas.width = width;
+        tempFrameCanvas.height = height;
+        tempFrameCtx = tempFrameCanvas.getContext('2d');
+        // First frame - just copy current to prev
+        prevFrameCtx.drawImage(cameraCanvas, 0, 0);
+      } else {
+        // Copy current frame to temp buffer
+        tempFrameCtx.drawImage(cameraCanvas, 0, 0);
+        // Draw prev frame as base
+        cameraCtx.drawImage(prevFrameCanvas, 0, 0);
+        // Blend current frame on top
+        cameraCtx.globalAlpha = frameBlendAmount;
+        cameraCtx.drawImage(tempFrameCanvas, 0, 0);
+        cameraCtx.globalAlpha = 1;
+        // Update prev frame buffer
+        prevFrameCtx.drawImage(cameraCanvas, 0, 0);
+      }
+
+      // Continue loop
+      cameraAnimationId = requestAnimationFrame((ts) => processCameraFrame(video, ts));
+    }
+
+    function startCameraProcessing(video) {
+      cameraProcessingActive = true;
+      cameraCanvas.classList.add('active');
+      cameraAnimationId = requestAnimationFrame((ts) => processCameraFrame(video, ts));
+    }
+
+    function stopCameraProcessing() {
+      cameraProcessingActive = false;
+      cameraCanvas.classList.remove('active');
+      if (cameraAnimationId) {
+        cancelAnimationFrame(cameraAnimationId);
+        cameraAnimationId = null;
+      }
+    }
+
+    // ===========================================
+    // CONFIGURATION
+    // ===========================================
+
+    // Option 1: Use your Google Apps Script URL (recommended - keeps sheet private)
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxL2XSVFR_sJfgBiYXpuq3wsmaU_3rFyxPtyAvrXZLSVkH-44KWnTHeufdRfNJ5_xWi/exec';
+
+    // Option 2: Demo/fallback data (sampled from live data)
+    const DEMO_DATA = {
+      colA: [
+        'a small park or garden nearby',
+        'a hidden corner of a street or alley',
+        'an elevated space with a view',
+        'a tree you often pass',
+        'a quiet street corner where you can pause'
+      ],
+      colB: [
+        'walk without checking your phone',
+        'count your breaths as you pace',
+        'sit and swing your legs',
+        'pause to smell a nearby plant',
+        'stretch your arms toward the sky'
+      ],
+      colC: [
+        'the quietest sound',
+        'the direction of the wind',
+        'the breeze on your skin',
+        'shadows moving over pavement',
+        'details you normally overlook'
+      ],
+      colD: []
+    };
+
+    // Storage settings
+    const STORAGE_KEY = 'randomRitual';
+    const LOCK_DURATION = 0; // Disabled for testing (set to 60 * 60 * 1000 for 1 hour)
+
+    // Animation effects registry
+    const EFFECTS = {
+      1: 'random-letters',
+      2: 'magic-8-ball',
+      3: 'breathe',
+      4: 'blur-resolve'
+    };
+
+    // Current effect (can be changed via UI)
+    let currentEffect = 1;
+
+
+    // ===========================================
+    // APP
+    // ===========================================
+
+    let words = { colA: [], colB: [], colC: [], colD: [] };
+    let isLocked = false;
+    let lockTimer = null;
+    let tapCount = 0;
+    let tapTimeout = null;
+    let cameraStream = null;
+    let cameraActive = false;
+
+    const row1 = document.getElementById('row1');
+    const row2 = document.getElementById('row2');
+    const row3 = document.getElementById('row3');
+    const textBlock = document.getElementById('textBlock');
+    const landingScreen = document.getElementById('landingScreen');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const mainContent = document.getElementById('mainContent');
+    const infoPanel = document.getElementById('infoPanel');
+    const contributorsPanel = document.getElementById('contributorsPanel');
+    const contributorsButton = document.getElementById('contributorsButton');
+    const helpPanel = document.getElementById('helpPanel');
+    const arrowButton = document.getElementById('arrowButton');
+    const regenButton = document.getElementById('regenButton');
+    const previewButton = document.getElementById('previewButton');
+    const infoButton = document.getElementById('infoButton');
+    const closeButtonInfo = document.getElementById('closeButtonInfo');
+    const closeButtonContrib = document.getElementById('closeButtonContrib');
+    const iconButtons = document.querySelector('.icon-buttons');
+    const saveButtonContainer = document.querySelector('.save-button-container');
+    const saveButton = document.getElementById('saveButton');
+    const cameraVideo = document.getElementById('cameraVideo');
+    const cameraOverlay = document.getElementById('cameraOverlay');
+    const lockIndicator = document.getElementById('lockIndicator');
+    const effectSelector = document.getElementById('effectSelector');
+    const effectButtons = document.getElementById('effectButtons');
+    const flashOverlay = document.getElementById('flashOverlay');
+    const imagePreviewOverlay = document.getElementById('imagePreviewOverlay');
+    const imagePreview = document.getElementById('imagePreview');
+    const imagePreviewClose = document.getElementById('imagePreviewClose');
+
+    // App state
+    let appState = 'start'; // 'start', 'loading', 'ritual', 'info'
+
+    // Build row content
+    // Row 1 (left): "Visit [place]"
+    // Row 2 (right): "Take a moment to [activity]"
+    // Row 3 (left): "focus on [details]"
+    // Helper to split text so last word + punctuation stay together
+    function splitWithPunctuation(prefix, text, punctuation) {
+      const words = text.trim().split(' ');
+      if (words.length <= 1) {
+        // Single word - keep it all together
+        return [{ text: prefix + text + punctuation, isHighlight: false, nowrap: true }];
+      }
+      // Multiple words - separate last word + punctuation
+      const lastWord = words.pop();
+      const leadingWords = words.join(' ');
+      return [
+        { text: prefix + leadingWords + ' ', isHighlight: false },
+        { text: lastWord + punctuation, isHighlight: false, nowrap: true }
+      ];
+    }
+
+    function getRowContent(a, b, c) {
+      return {
+        row1: [
+          { text: 'Visit', isHighlight: true },
+          ...splitWithPunctuation(' ', a, '.')
+        ],
+        row2: [
+          { text: 'Take a ', isHighlight: false },
+          { text: 'moment', isHighlight: true },
+          ...splitWithPunctuation(' to ', b, ',')
+        ],
+        row3: [
+          { text: 'focus', isHighlight: true },
+          ...splitWithPunctuation(' on ', c, '.')
+        ]
+      };
+    }
+
+    // Render a row with words
+    function renderRow(rowEl, words) {
+      rowEl.innerHTML = '';
+      words.forEach(word => {
+        const span = document.createElement('span');
+        span.className = 'word ' + (word.isHighlight ? 'highlight' : 'dark');
+        if (word.nowrap) {
+          span.style.whiteSpace = 'nowrap';
+        }
+        span.textContent = word.text;
+        rowEl.appendChild(span);
+      });
+    }
+
+    // Render all rows
+    function renderAllRows(a, b, c) {
+      const rows = getRowContent(a, b, c);
+      renderRow(row1, rows.row1);
+      renderRow(row2, rows.row2);
+      renderRow(row3, rows.row3);
+    }
+
+    // ===========================================
+    // LOCAL STORAGE
+    // ===========================================
+
+    function saveRitual(a, b, c) {
+      const data = {
+        ritual: { a, b, c },
+        timestamp: Date.now()
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function loadRitual() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (!stored) return null;
+        return JSON.parse(stored);
+      } catch {
+        return null;
+      }
+    }
+
+    function clearRitual() {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+
+    function getRemainingTime() {
+      const stored = loadRitual();
+      if (!stored) return 0;
+      const elapsed = Date.now() - stored.timestamp;
+      return Math.max(0, LOCK_DURATION - elapsed);
+    }
+
+    function formatTime(ms) {
+      const mins = Math.floor(ms / 60000);
+      const secs = Math.floor((ms % 60000) / 1000);
+      if (mins > 0) {
+        return `${mins}m ${secs}s`;
+      }
+      return `${secs}s`;
+    }
+
+    // ===========================================
+    // LOCK STATE
+    // ===========================================
+
+    function setLocked(locked) {
+      // If lock duration is 0, never actually lock
+      if (LOCK_DURATION === 0) {
+        isLocked = false;
+        return;
+      }
+
+      isLocked = locked;
+      if (locked) {
+        regenButton.classList.add('locked');
+        arrowButton.classList.add('locked');
+        lockIndicator.classList.remove('content-hidden');
+        document.body.style.cursor = 'default';
+        updateLockTimer();
+      } else {
+        regenButton.classList.remove('locked');
+        arrowButton.classList.remove('locked');
+        lockIndicator.classList.add('content-hidden');
+        lockIndicator.textContent = '';
+        document.body.style.cursor = 'pointer';
+        if (lockTimer) {
+          clearInterval(lockTimer);
+          lockTimer = null;
+        }
+      }
+    }
+
+    function updateLockTimer() {
+      const remaining = getRemainingTime();
+      if (remaining <= 0) {
+        setLocked(false);
+        clearRitual();
+        return;
+      }
+      lockIndicator.textContent = `Ritual locked · ${formatTime(remaining)} remaining`;
+      if (!lockTimer) {
+        lockTimer = setInterval(updateLockTimer, 1000);
+      }
+    }
+
+    // ===========================================
+    // CONTENT DISPLAY
+    // ===========================================
+
+    // ===========================================
+    // STATE MANAGEMENT
+    // ===========================================
+
+    function showLandingScreen() {
+      appState = 'landing';
+      landingScreen.classList.remove('hidden');
+      loadingOverlay.classList.remove('visible');
+      mainContent.classList.add('content-hidden');
+      infoPanel.classList.remove('visible');
+      contributorsPanel.classList.remove('visible');
+      helpPanel.classList.remove('visible');
+      arrowButton.classList.remove('visible');
+      arrowButton.classList.remove('show-home');
+      regenButton.classList.remove('visible');
+      iconButtons.classList.remove('visible');
+      saveButtonContainer.classList.remove('visible');
+            effectSelector.classList.add('content-hidden');
+      infoButton.classList.remove('active');
+    }
+
+    let ellipsisInterval = null;
+
+    async function animateLandingText() {
+      const landingText = document.querySelector('.landing-text');
+      const landingStatus = document.querySelector('.landing-status');
+
+      // Simple fade in with blur resolve
+      landingText.style.opacity = '0';
+      landingText.style.filter = 'blur(2px)';
+      landingText.style.transition = 'opacity 0.5s ease-out, filter 1.2s ease-out';
+
+      landingStatus.style.opacity = '0';
+      landingStatus.style.filter = 'blur(2px)';
+      landingStatus.style.transition = 'opacity 0.5s ease-out, filter 1.2s ease-out';
+
+      await new Promise(r => setTimeout(r, 100));
+
+      // Fade in and resolve landing text
+      landingText.style.opacity = '1';
+      landingText.style.filter = 'blur(0)';
+
+      await new Promise(r => setTimeout(r, 100));
+
+      // Fade in and resolve status
+      landingStatus.style.opacity = '1';
+      landingStatus.style.filter = 'blur(0)';
+
+      // Start ellipsis animation
+      startEllipsisAnimation(landingStatus);
+
+      // Auto-progress after animation completes
+      await new Promise(r => setTimeout(r, 800));
+      autoStartRitual();
+    }
+
+    function startEllipsisAnimation(element) {
+      let dots = 0;
+      const baseText = 'Ritualising now';
+      ellipsisInterval = setInterval(() => {
+        dots = (dots + 1) % 4;
+        element.textContent = baseText + '.'.repeat(dots || 1);
+      }, 400);
+    }
+
+    function stopEllipsisAnimation() {
+      if (ellipsisInterval) {
+        clearInterval(ellipsisInterval);
+        ellipsisInterval = null;
+      }
+    }
+
+    async function autoStartRitual() {
+      const startTime = Date.now();
+      const minDuration = 5000; // Minimum 5 seconds on landing
+
+      // Fetch data if not already loaded
+      if (words.colA.length === 0) {
+        await fetchData();
+      }
+
+      // Ensure minimum time on landing page
+      const elapsed = Date.now() - startTime;
+      if (elapsed < minDuration) {
+        await new Promise(r => setTimeout(r, minDuration - elapsed));
+      }
+
+      // Stop ellipsis and transition to ritual
+      stopEllipsisAnimation();
+
+      // Fade out landing screen
+      landingScreen.classList.add('hidden');
+      await new Promise(r => setTimeout(r, 600));
+
+      // Show ritual with effect 4 (blur-resolve)
+      showRitualScreen();
+      await generateNewRitual();
+    }
+
+    async function showLoadingScreen() {
+      appState = 'loading';
+      landingScreen.classList.add('hidden');
+      loadingOverlay.classList.add('visible');
+      mainContent.classList.add('content-hidden');
+      infoPanel.classList.remove('visible');
+      contributorsPanel.classList.remove('visible');
+      helpPanel.classList.remove('visible');
+      arrowButton.classList.remove('visible');
+      regenButton.classList.remove('visible');
+      effectSelector.classList.add('content-hidden');
+      infoButton.classList.remove('active');
+
+      // Animate loading text
+      await animateLoadingText();
+    }
+
+    async function animateLoadingText() {
+      const description = document.querySelector('.loading-description');
+      const status = document.querySelector('.loading-status');
+
+      // Simple fade in with blur resolve
+      description.style.opacity = '0';
+      description.style.filter = 'blur(10px)';
+      description.style.transition = 'opacity 0.5s ease-out, filter 1.2s ease-out';
+
+      status.style.opacity = '0';
+      status.style.filter = 'blur(15px)';
+      status.style.transition = 'opacity 0.5s ease-out, filter 1.5s ease-out';
+
+      await new Promise(r => setTimeout(r, 100));
+
+      // Fade in and resolve description
+      description.style.opacity = '1';
+      description.style.filter = 'blur(0)';
+
+      await new Promise(r => setTimeout(r, 800));
+
+      // Fade in and resolve status
+      status.style.opacity = '1';
+      status.style.filter = 'blur(0)';
+
+      await new Promise(r => setTimeout(r, 1200));
+    }
+
+    function showRitualScreen(showButtonsImmediately = true) {
+      appState = 'ritual';
+      landingScreen.classList.add('hidden');
+      loadingOverlay.classList.remove('visible');
+      mainContent.classList.remove('content-hidden');
+      infoPanel.classList.remove('visible');
+      contributorsPanel.classList.remove('visible');
+      helpPanel.classList.remove('visible');
+      arrowButton.classList.remove('show-home');
+      effectSelector.classList.remove('content-hidden');
+      infoButton.classList.remove('active');
+
+      if (showButtonsImmediately) {
+        arrowButton.classList.add('visible');
+        regenButton.classList.add('visible');
+        iconButtons.classList.add('visible');
+        // Re-show save button if ritual is displayed
+        if (row1.textContent.trim()) {
+          saveButtonContainer.classList.add('visible');
+        }
+      }
+    }
+
+    function showRitualButtons() {
+      arrowButton.classList.add('visible');
+      regenButton.classList.add('visible');
+      iconButtons.classList.add('visible');
+    }
+
+    function toggleInfoPanel() {
+      if (appState === 'info') {
+        // Return to ritual
+        showRitualScreen();
+      } else {
+        // Show info
+        appState = 'info';
+        infoPanel.classList.add('visible');
+        contributorsPanel.classList.remove('visible');
+        helpPanel.classList.remove('visible');
+        mainContent.classList.add('content-hidden');
+        landingScreen.classList.add('hidden');
+        loadingOverlay.classList.remove('visible');
+        // Hide all buttons except close
+        arrowButton.classList.remove('visible');
+        regenButton.classList.remove('visible');
+        iconButtons.classList.remove('visible');
+        saveButtonContainer.classList.remove('visible');
+        effectSelector.classList.add('content-hidden');
+        infoButton.classList.remove('active');
+        // Show close button
+              }
+    }
+
+    function toggleContributorsPanel() {
+      if (appState === 'contributors') {
+        // Return to info
+        appState = 'info';
+        contributorsPanel.classList.remove('visible');
+        infoPanel.classList.add('visible');
+      } else {
+        // Show contributors
+        appState = 'contributors';
+        contributorsPanel.classList.add('visible');
+        infoPanel.classList.remove('visible');
+        helpPanel.classList.remove('visible');
+        mainContent.classList.add('content-hidden');
+        landingScreen.classList.add('hidden');
+        loadingOverlay.classList.remove('visible');
+        // Hide all buttons except close
+        arrowButton.classList.remove('visible');
+        regenButton.classList.remove('visible');
+        iconButtons.classList.remove('visible');
+        saveButtonContainer.classList.remove('visible');
+        effectSelector.classList.add('content-hidden');
+        infoButton.classList.remove('active');
+        // Show close button
+              }
+    }
+
+    function toggleHelpPanel() {
+      if (appState === 'help') {
+        // Return to ritual
+        showRitualScreen();
+      } else {
+        // Show help
+        appState = 'help';
+        helpPanel.classList.add('visible');
+        infoPanel.classList.remove('visible');
+        contributorsPanel.classList.remove('visible');
+        mainContent.classList.add('content-hidden');
+        landingScreen.classList.add('hidden');
+        loadingOverlay.classList.remove('visible');
+        arrowButton.classList.add('visible');
+        arrowButton.classList.add('show-home');
+        regenButton.classList.remove('visible');
+        iconButtons.classList.remove('visible');
+        saveButtonContainer.classList.remove('visible');
+        effectSelector.classList.add('content-hidden');
+        infoButton.classList.remove('active');
+      }
+    }
+
+    function getAnimationStyle() {
+      return EFFECTS[currentEffect] || 'random-letters';
+    }
+
+    async function displayRitual(a, b, c, animate = false) {
+      if (animate) {
+        await animateWords(a, b, c);
+      } else {
+        renderAllRows(a, b, c);
+      }
+    }
+
+    // ===========================================
+    // DATA FETCHING
+    // ===========================================
+
+    async function fetchData() {
+      // Fetch data from sheet (with 5s timeout fallback)
+      if (APPS_SCRIPT_URL) {
+        try {
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 5000);
+
+          const response = await fetch(APPS_SCRIPT_URL, { signal: controller.signal });
+          clearTimeout(timeout);
+          words = await response.json();
+        } catch (error) {
+          console.error('Failed to fetch:', error);
+          words = DEMO_DATA;
+        }
+      } else {
+        words = DEMO_DATA;
+      }
+
+      // Update contributors list
+      if (words.colD && words.colD.length > 0) {
+        const contributorsList = document.getElementById('contributorsList');
+        contributorsList.textContent = words.colD.join(' / ') + '.';
+      }
+    }
+
+    async function startRitual() {
+      // Show loading screen with animation
+      await showLoadingScreen();
+
+      // Fetch data if not already loaded
+      if (words.colA.length === 0) {
+        await fetchData();
+      }
+
+      // Small pause before transitioning
+      await new Promise(r => setTimeout(r, 500));
+
+      // Generate and display ritual (don't show buttons yet)
+      showRitualScreen(false);
+      await generateNewRitual();
+
+      // Show buttons after animation completes
+      showRitualButtons();
+    }
+
+    async function handleArrowClick() {
+      if (appState === 'landing') {
+        await startRitual();
+      } else if (appState === 'ritual') {
+        // Open submit flow
+        openModal();
+      } else if (appState === 'info' || appState === 'help' || appState === 'contributors') {
+        // Home button - return to ritual
+        showRitualScreen();
+      }
+    }
+
+    // ===========================================
+    // TEXT ANIMATIONS
+    // ===========================================
+
+    // Utility functions
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    let activeTimeouts = [];
+    function trackedTimeout(fn, delay) {
+      const id = setTimeout(() => {
+        fn();
+        activeTimeouts = activeTimeouts.filter(t => t !== id);
+      }, delay);
+      activeTimeouts.push(id);
+      return id;
+    }
+
+    function clearAllAnimations() {
+      activeTimeouts.forEach(id => clearTimeout(id));
+      activeTimeouts = [];
+    }
+
+    // Get all word spans from the text block, separated by type
+    function getWordsByType() {
+      const highlights = document.querySelectorAll('#textBlock .word.highlight');
+      const darks = document.querySelectorAll('#textBlock .word.dark');
+      return { highlights: Array.from(highlights), darks: Array.from(darks) };
+    }
+
+    // Get all rows for animation
+    function getAllRows() {
+      return [row1, row2, row3];
+    }
+
+    // Create letter spans inside a word div, return array of spans
+    function createLetterSpans(wordDiv) {
+      const text = wordDiv.textContent;
+      const isHighlight = wordDiv.classList.contains('highlight');
+      wordDiv.innerHTML = '';
+      const spans = [];
+      text.split('').forEach(char => {
+        const span = document.createElement('span');
+        span.className = 'letter hidden';
+        span.textContent = char;
+        span.dataset.isHighlight = isHighlight;
+        wordDiv.appendChild(span);
+        spans.push(span);
+      });
+      return spans;
+    }
+
+    // Animate letters appearing randomly
+    function animateLettersRandomly(letterSpans, delay = 30) {
+      return new Promise(resolve => {
+        if (letterSpans.length === 0) { resolve(); return; }
+        const shuffled = shuffle([...letterSpans.keys()]);
+        shuffled.forEach((idx, i) => {
+          trackedTimeout(() => {
+            letterSpans[idx].classList.remove('hidden');
+            letterSpans[idx].classList.add('fade-in');
+            if (i === shuffled.length - 1) {
+              trackedTimeout(resolve, 300);
+            }
+          }, i * delay);
+        });
+      });
+    }
+
+    // ===========================================
+    // EFFECT 1: Random Letters
+    // ===========================================
+    async function animateRandomLetters(a, b, c) {
+      // Render rows but hidden
+      renderAllRows(a, b, c);
+      const { highlights, darks } = getWordsByType();
+
+      // Hide all spans
+      [...highlights, ...darks].forEach(el => el.style.opacity = '0');
+
+      // Create letter spans for each highlight word separately
+      const highlightWords = [];
+      highlights.forEach(el => {
+        const wordLetters = createLetterSpans(el);
+        el.style.opacity = '1';
+        highlightWords.push(wordLetters);
+      });
+
+      // Stagger each highlight word in sequence
+      for (let w = 0; w < highlightWords.length; w++) {
+        await animateLettersRandomly(highlightWords[w], 40);
+        await new Promise(r => setTimeout(r, 300));
+      }
+
+      // Create letter spans for darks
+      const darkLetters = [];
+      darks.forEach(el => {
+        darkLetters.push(...createLetterSpans(el));
+        el.style.opacity = '1';
+      });
+
+      // Animate dark text
+      await animateLettersRandomly(darkLetters, 20);
+    }
+
+    // ===========================================
+    // EFFECT 2: Magic 8-ball
+    // ===========================================
+    const waterDisplace = document.getElementById('water-displace');
+    const waterDisplaceSubtle = document.getElementById('water-displace-subtle');
+
+    // Smooth easing function (ease-out cubic)
+    function easeOutCubic(t) {
+      return 1 - Math.pow(1 - t, 3);
+    }
+
+    // Animate SVG displacement smoothly
+    function animateDisplacementSmooth(element, fromScale, toScale, duration) {
+      return new Promise(resolve => {
+        const startTime = performance.now();
+
+        function tick() {
+          const elapsed = performance.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = easeOutCubic(progress);
+          const scale = fromScale + (toScale - fromScale) * eased;
+
+          element.setAttribute('scale', scale);
+
+          if (progress < 1) {
+            requestAnimationFrame(tick);
+          } else {
+            resolve();
+          }
+        }
+
+        requestAnimationFrame(tick);
+      });
+    }
+
+    async function animateMagic8Ball(a, b, c) {
+      clearAllAnimations();
+
+      // Render rows but hidden
+      renderAllRows(a, b, c);
+      const { highlights, darks } = getWordsByType();
+      const allWords = [...highlights, ...darks];
+
+      // Hide all and set initial displacement
+      allWords.forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'none';
+      });
+
+      waterDisplace.setAttribute('scale', '40');
+      waterDisplaceSubtle.setAttribute('scale', '30');
+
+      // Prepare all letters upfront
+      const highlightLetters = [];
+      highlights.forEach(el => {
+        highlightLetters.push(...createLetterSpans(el));
+        el.classList.add('m8b-active');
+      });
+
+      const darkLetters = [];
+      darks.forEach(el => {
+        darkLetters.push(...createLetterSpans(el));
+        el.classList.add('m8b-active');
+      });
+
+      await new Promise(r => trackedTimeout(r, 300));
+
+      // Start the smooth displacement animation for highlights
+      animateDisplacementSmooth(waterDisplace, 40, 0, 3000);
+
+      // Show and animate highlight words rising
+      highlights.forEach((el, i) => {
+        trackedTimeout(() => {
+          el.style.opacity = '1';
+          el.style.transition = 'transform 1.5s cubic-bezier(0.16, 1, 0.3, 1)';
+          el.style.transform = 'translateY(0)';
+        }, i * 100);
+      });
+
+      // Animate white letters appearing
+      await animateLettersRandomly(highlightLetters, 25);
+      await new Promise(r => trackedTimeout(r, 400));
+
+      // Start displacement for dark text
+      animateDisplacementSmooth(waterDisplaceSubtle, 30, 0, 2500);
+
+      // Show and animate dark words rising
+      darks.forEach((el, i) => {
+        trackedTimeout(() => {
+          el.style.opacity = '1';
+          el.style.transition = 'transform 1.2s cubic-bezier(0.16, 1, 0.3, 1)';
+          el.style.transform = 'translateY(0)';
+        }, i * 40);
+      });
+
+      // Animate dark letters appearing
+      await animateLettersRandomly(darkLetters, 15);
+      await new Promise(r => trackedTimeout(r, 600));
+
+      // Clean up
+      allWords.forEach(el => {
+        el.classList.remove('m8b-active');
+        el.style.transition = '';
+        el.style.transform = '';
+      });
+    }
+
+    // ===========================================
+    // EFFECT 3: Scatter
+    // ===========================================
+    let scatterElements = [];
+
+    function resetScatter() {
+      clearAllAnimations();
+      scatterElements.forEach(el => el.remove());
+      scatterElements = [];
+    }
+
+    async function animateScatter(a, b, c) {
+      resetScatter();
+
+      // Render rows but hidden
+      renderAllRows(a, b, c);
+      const { highlights, darks } = getWordsByType();
+      const allWords = [...highlights, ...darks];
+
+      // Hide all
+      allWords.forEach(el => el.style.opacity = '0');
+      await new Promise(r => requestAnimationFrame(r));
+
+      // Measure positions for each character
+      const letterData = [];
+      allWords.forEach(el => {
+        const text = el.textContent;
+        const isHighlight = el.classList.contains('highlight');
+        const style = window.getComputedStyle(el);
+
+        // Temporarily convert to letter spans for measurement
+        el.innerHTML = '';
+        text.split('').forEach(char => {
+          const span = document.createElement('span');
+          span.textContent = char;
+          span.style.display = 'inline-block';
+          el.appendChild(span);
+        });
+      });
+
+      await new Promise(r => requestAnimationFrame(r));
+
+      allWords.forEach(el => {
+        const isHighlight = el.classList.contains('highlight');
+        const style = window.getComputedStyle(el);
+        el.querySelectorAll('span').forEach(span => {
+          const rect = span.getBoundingClientRect();
+          letterData.push({
+            char: span.textContent,
+            targetX: rect.left,
+            targetY: rect.top,
+            fontSize: style.fontSize,
+            fontWeight: style.fontWeight,
+            isHighlight
+          });
+        });
+        // Reset to plain text
+        el.textContent = Array.from(el.querySelectorAll('span'))
+          .map(s => s.textContent).join('');
+      });
+
+      // Create scattered letters
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      // Separate into white and dark
+      const whiteData = letterData.filter(d => d.isHighlight);
+      const darkData = letterData.filter(d => !d.isHighlight);
+
+      // Create white scattered letters
+      const whiteScatter = whiteData.map(data => {
+        const letter = document.createElement('span');
+        letter.className = 'scatter-letter';
+        letter.textContent = data.char;
+        letter.style.fontSize = data.fontSize;
+        letter.style.fontWeight = data.fontWeight;
+        letter.style.left = Math.random() * vw + 'px';
+        letter.style.top = Math.random() * vh + 'px';
+        letter.dataset.targetX = data.targetX;
+        letter.dataset.targetY = data.targetY;
+        document.body.appendChild(letter);
+        scatterElements.push(letter);
+        return letter;
+      });
+
+      // Create dark scattered letters
+      const darkScatter = darkData.map(data => {
+        const letter = document.createElement('span');
+        letter.className = 'scatter-letter-dark';
+        letter.textContent = data.char;
+        letter.style.fontSize = data.fontSize;
+        letter.style.fontWeight = data.fontWeight;
+        letter.style.left = Math.random() * vw + 'px';
+        letter.style.top = Math.random() * vh + 'px';
+        letter.dataset.targetX = data.targetX;
+        letter.dataset.targetY = data.targetY;
+        document.body.appendChild(letter);
+        scatterElements.push(letter);
+        return letter;
+      });
+
+      // Phase 1: Fade in white letters
+      shuffle([...whiteScatter.keys()]).forEach((idx, i) => {
+        trackedTimeout(() => whiteScatter[idx].classList.add('visible'), i * 40);
+      });
+      await new Promise(r => trackedTimeout(r, whiteScatter.length * 40 + 300));
+
+      // Phase 2: Fade in dark letters
+      shuffle([...darkScatter.keys()]).forEach((idx, i) => {
+        trackedTimeout(() => darkScatter[idx].classList.add('visible'), i * 25);
+      });
+      await new Promise(r => trackedTimeout(r, darkScatter.length * 25 + 400));
+
+      // Phase 3: White letters settle
+      whiteScatter.forEach((letter, i) => {
+        trackedTimeout(() => {
+          letter.classList.add('settling');
+          letter.style.left = letter.dataset.targetX + 'px';
+          letter.style.top = letter.dataset.targetY + 'px';
+        }, i * 50);
+      });
+      await new Promise(r => trackedTimeout(r, whiteScatter.length * 50 + 1200));
+
+      // Phase 4: Dark letters settle
+      darkScatter.forEach((letter, i) => {
+        trackedTimeout(() => {
+          letter.classList.add('settling');
+          letter.style.left = letter.dataset.targetX + 'px';
+          letter.style.top = letter.dataset.targetY + 'px';
+        }, i * 20);
+      });
+      await new Promise(r => trackedTimeout(r, darkScatter.length * 20 + 1200));
+
+      // Final: Show actual text
+      scatterElements.forEach(l => l.classList.add('settled'));
+      await new Promise(r => trackedTimeout(r, 200));
+      allWords.forEach(el => el.style.opacity = '1');
+
+      scatterElements.forEach(l => l.remove());
+      scatterElements = [];
+    }
+
+    // ===========================================
+    // EFFECT 4: Splash/Liquid
+    // ===========================================
+    const splashTurbulence = document.getElementById('splash-turbulence');
+    const splashDisplace = document.getElementById('splash-displace');
+    const splashBlur = document.getElementById('splash-blur');
+    const splashTurbulenceDark = document.getElementById('splash-turbulence-dark');
+    const splashDisplaceDark = document.getElementById('splash-displace-dark');
+    const splashBlurDark = document.getElementById('splash-blur-dark');
+
+    // Animate turbulence for liquid ripple effect (single value)
+    function animateTurbulence(element, fromFreq, toFreq, duration) {
+      return new Promise(resolve => {
+        const startTime = performance.now();
+
+        function tick() {
+          const elapsed = performance.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = easeOutCubic(progress);
+          const freq = fromFreq + (toFreq - fromFreq) * eased;
+
+          element.setAttribute('baseFrequency', freq.toFixed(4));
+
+          if (progress < 1) {
+            requestAnimationFrame(tick);
+          } else {
+            resolve();
+          }
+        }
+
+        requestAnimationFrame(tick);
+      });
+    }
+
+    // Animate turbulence with 2D frequency (x y values)
+    function animateTurbulence2D(element, fromFreq, toFreq, duration) {
+      return new Promise(resolve => {
+        const startTime = performance.now();
+
+        function tick() {
+          const elapsed = performance.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = easeOutCubic(progress);
+          const freqX = fromFreq[0] + (toFreq[0] - fromFreq[0]) * eased;
+          const freqY = fromFreq[1] + (toFreq[1] - fromFreq[1]) * eased;
+
+          element.setAttribute('baseFrequency', `${freqX.toFixed(4)} ${freqY.toFixed(4)}`);
+
+          if (progress < 1) {
+            requestAnimationFrame(tick);
+          } else {
+            resolve();
+          }
+        }
+
+        requestAnimationFrame(tick);
+      });
+    }
+
+    // Animate displacement scale for splash
+    function animateSplashDisplace(element, fromScale, toScale, duration) {
+      return new Promise(resolve => {
+        const startTime = performance.now();
+
+        function tick() {
+          const elapsed = performance.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = easeOutCubic(progress);
+          const scale = fromScale + (toScale - fromScale) * eased;
+
+          element.setAttribute('scale', scale);
+
+          if (progress < 1) {
+            requestAnimationFrame(tick);
+          } else {
+            resolve();
+          }
+        }
+
+        requestAnimationFrame(tick);
+      });
+    }
+
+    // Animate blur for splash
+    function animateSplashBlur(element, fromBlur, toBlur, duration) {
+      return new Promise(resolve => {
+        const startTime = performance.now();
+
+        function tick() {
+          const elapsed = performance.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = easeOutCubic(progress);
+          const blur = fromBlur + (toBlur - fromBlur) * eased;
+
+          element.setAttribute('stdDeviation', blur.toFixed(2));
+
+          if (progress < 1) {
+            requestAnimationFrame(tick);
+          } else {
+            resolve();
+          }
+        }
+
+        requestAnimationFrame(tick);
+      });
+    }
+
+    async function animateSplash(a, b, c) {
+      clearAllAnimations();
+
+      // Render rows
+      renderAllRows(a, b, c);
+      const { highlights, darks } = getWordsByType();
+      const allWords = [...highlights, ...darks];
+
+      // Phase 1: Start with extreme distortion - letters are pure noise blobs
+      splashDisplace.setAttribute('scale', '300');
+      splashBlur.setAttribute('stdDeviation', '15');
+      splashTurbulence.setAttribute('baseFrequency', '0.02 0.015');
+
+      splashDisplaceDark.setAttribute('scale', '250');
+      splashBlurDark.setAttribute('stdDeviation', '12');
+      splashTurbulenceDark.setAttribute('baseFrequency', '0.025 0.02');
+
+      // Show highlights as noise blobs (fully visible but unrecognizable)
+      highlights.forEach(el => {
+        el.style.opacity = '1';
+        el.classList.add('splash-active');
+      });
+
+      darks.forEach(el => {
+        el.style.opacity = '0';
+        el.classList.add('splash-active');
+      });
+
+      // Hold the noise visible
+      await new Promise(r => trackedTimeout(r, 600));
+
+      // Phase 2: Noise settles into letters
+      // Animate displacement and blur down to 0, revealing the letters
+      animateSplashDisplace(splashDisplace, 300, 0, 2500);
+      animateSplashBlur(splashBlur, 15, 0, 2200);
+
+      await new Promise(r => trackedTimeout(r, 2000));
+
+      // Phase 3: Dark words - show as noise first
+      darks.forEach(el => {
+        el.style.opacity = '1';
+      });
+
+      // Hold dark noise
+      await new Promise(r => trackedTimeout(r, 400));
+
+      // Settle into letters
+      animateSplashDisplace(splashDisplaceDark, 250, 0, 2000);
+      animateSplashBlur(splashBlurDark, 12, 0, 1800);
+
+      await new Promise(r => trackedTimeout(r, 1800));
+
+      // Clean up
+      allWords.forEach(el => {
+        el.classList.remove('splash-active');
+        el.style.opacity = '';
+      });
+    }
+
+    // ===========================================
+    // EFFECT 4: Blur Resolve
+    // ===========================================
+    const blurResolveAmount = document.getElementById('blur-resolve-amount');
+    const blurResolveDarkAmount = document.getElementById('blur-resolve-dark-amount');
+
+    // Animate blur amount
+    function animateBlurAmount(element, fromBlur, toBlur, duration) {
+      return new Promise(resolve => {
+        const startTime = performance.now();
+
+        function tick() {
+          const elapsed = performance.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = easeOutCubic(progress);
+          const blur = fromBlur + (toBlur - fromBlur) * eased;
+
+          element.setAttribute('stdDeviation', blur.toFixed(2));
+
+          if (progress < 1) {
+            requestAnimationFrame(tick);
+          } else {
+            resolve();
+          }
+        }
+
+        requestAnimationFrame(tick);
+      });
+    }
+
+    async function animateBlurResolve(a, b, c) {
+      clearAllAnimations();
+
+      // Render rows
+      renderAllRows(a, b, c);
+      const { highlights, darks } = getWordsByType();
+
+      // Set up highlight words to animate as whole words (not individual characters)
+      highlights.forEach(el => {
+        el.style.opacity = '0';
+        el.style.filter = 'blur(12px)';
+        el.style.transition = 'opacity 0.3s linear, filter 1s linear';
+      });
+
+      // Create letter spans for darks with individual blur
+      const darkLetters = [];
+      darks.forEach(el => {
+        const text = el.textContent;
+        el.innerHTML = '';
+        text.split('').forEach(char => {
+          const span = document.createElement('span');
+          span.className = 'letter';
+          span.textContent = char;
+          span.style.opacity = '0';
+          span.style.filter = 'blur(30px)';
+          span.style.transition = 'opacity 0.3s linear, filter 0.8s linear';
+          span.style.display = 'inline';
+          el.appendChild(span);
+          darkLetters.push(span);
+        });
+      });
+
+      await new Promise(r => trackedTimeout(r, 800));
+
+      // Animate each highlight word in sequence (as whole words)
+      for (let w = 0; w < highlights.length; w++) {
+        highlights[w].style.opacity = '1';
+        highlights[w].style.filter = 'blur(0)';
+        // Wait between words (extended for longer animation)
+        await new Promise(r => trackedTimeout(r, 1200));
+      }
+
+      await new Promise(r => trackedTimeout(r, 600));
+
+      // Animate dark letters randomly with blur resolve
+      const darkShuffled = shuffle([...darkLetters.keys()]);
+
+      darkShuffled.forEach((idx, i) => {
+        trackedTimeout(() => {
+          darkLetters[idx].style.opacity = '1';
+          darkLetters[idx].style.filter = 'blur(0)';
+        }, i * 15);
+      });
+
+      await new Promise(r => trackedTimeout(r, darkLetters.length * 15 + 1000));
+    }
+
+    // ===========================================
+    // EFFECT 5: Choke (feMorphology) - hidden
+    // ===========================================
+    const chokeErodeMorph = document.getElementById('choke-erode-morph');
+    const chokeDilateMorph = document.getElementById('choke-dilate-morph');
+    const chokeErodeMorphDark = document.getElementById('choke-erode-morph-dark');
+    const chokeDilateMorphDark = document.getElementById('choke-dilate-morph-dark');
+
+    // Animate morphology radius
+    function animateChokeRadius(element, fromRadius, toRadius, duration) {
+      return new Promise(resolve => {
+        const startTime = performance.now();
+
+        function tick() {
+          const elapsed = performance.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = easeOutCubic(progress);
+          const radius = fromRadius + (toRadius - fromRadius) * eased;
+
+          element.setAttribute('radius', Math.max(0, radius).toFixed(2));
+
+          if (progress < 1) {
+            requestAnimationFrame(tick);
+          } else {
+            resolve();
+          }
+        }
+
+        requestAnimationFrame(tick);
+      });
+    }
+
+    async function animateChoke(a, b, c) {
+      clearAllAnimations();
+
+      // Render rows
+      renderAllRows(a, b, c);
+      const { highlights, darks } = getWordsByType();
+      const allWords = [...highlights, ...darks];
+
+      // Randomly choose erode (thin→normal) or dilate (thick→normal)
+      const useErode = Math.random() > 0.5;
+
+      // Set initial choke values
+      if (useErode) {
+        chokeErodeMorph.setAttribute('radius', '10');
+        chokeErodeMorphDark.setAttribute('radius', '8');
+      } else {
+        chokeDilateMorph.setAttribute('radius', '8');
+        chokeDilateMorphDark.setAttribute('radius', '6');
+      }
+
+      // Apply choke filter and hide
+      highlights.forEach(el => {
+        el.style.opacity = '0';
+        el.classList.add(useErode ? 'choke-erode' : 'choke-dilate');
+      });
+
+      darks.forEach(el => {
+        el.style.opacity = '0';
+        el.classList.add(useErode ? 'choke-erode-dark' : 'choke-dilate-dark');
+      });
+
+      await new Promise(r => trackedTimeout(r, 200));
+
+      // Fade in highlights with choke
+      highlights.forEach((el, i) => {
+        trackedTimeout(() => {
+          el.style.opacity = '1';
+        }, i * 150);
+      });
+
+      // Animate choke for highlights
+      await new Promise(r => trackedTimeout(r, 300));
+      if (useErode) {
+        animateChokeRadius(chokeErodeMorph, 10, 0, 2000);
+      } else {
+        animateChokeRadius(chokeDilateMorph, 8, 0, 2000);
+      }
+
+      await new Promise(r => trackedTimeout(r, 1500));
+
+      // Fade in darks with choke
+      darks.forEach((el, i) => {
+        trackedTimeout(() => {
+          el.style.opacity = '1';
+        }, i * 60);
+      });
+
+      // Animate choke for darks
+      await new Promise(r => trackedTimeout(r, 200));
+      if (useErode) {
+        animateChokeRadius(chokeErodeMorphDark, 8, 0, 1600);
+      } else {
+        animateChokeRadius(chokeDilateMorphDark, 6, 0, 1600);
+      }
+
+      await new Promise(r => trackedTimeout(r, 1400));
+
+      // Clean up
+      allWords.forEach(el => {
+        el.classList.remove('choke-erode', 'choke-dilate', 'choke-erode-dark', 'choke-dilate-dark');
+        el.style.opacity = '';
+      });
+    }
+
+    // ===========================================
+    // ANIMATION DISPATCHER
+    // ===========================================
+
+    async function animateWords(a, b, c) {
+      const style = getAnimationStyle();
+
+      if (style === 'random-letters') {
+        await animateRandomLetters(a, b, c);
+        return;
+      }
+
+      if (style === 'magic-8-ball') {
+        await animateMagic8Ball(a, b, c);
+        return;
+      }
+
+      if (style === 'breathe') {
+        await animateScatter(a, b, c);
+        return;
+      }
+
+      if (style === 'splash') {
+        await animateSplash(a, b, c);
+        return;
+      }
+
+      if (style === 'blur-resolve') {
+        await animateBlurResolve(a, b, c);
+        return;
+      }
+
+      // Fallback
+      renderAllRows(a, b, c);
+    }
+
+    // ===========================================
+    // RITUAL GENERATION
+    // ===========================================
+
+    function pickRandom(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    async function generateNewRitual() {
+      if (words.colA.length === 0) return;
+      if (isLocked) return;
+
+      // Hide all buttons when generating new ritual
+      arrowButton.classList.remove('visible');
+      regenButton.classList.remove('visible');
+      iconButtons.classList.remove('visible');
+      saveButtonContainer.classList.remove('visible');
+
+      const a = pickRandom(words.colA);
+      const b = pickRandom(words.colB);
+      const c = pickRandom(words.colC);
+
+      await animateWords(a, b, c);
+
+      // Show all buttons together after animation completes
+      setTimeout(() => {
+        arrowButton.classList.add('visible');
+        regenButton.classList.add('visible');
+        iconButtons.classList.add('visible');
+        saveButtonContainer.classList.add('visible');
+      }, 500);
+
+      saveRitual(a, b, c);
+      setLocked(true);
+    }
+
+    // ===========================================
+    // OVERRIDE (TRIPLE TAP)
+    // ===========================================
+
+    function handleOverrideTap() {
+      tapCount++;
+      clearTimeout(tapTimeout);
+
+      if (tapCount >= 5) {
+        // 5 taps to override
+        tapCount = 0;
+        if (isLocked) {
+          clearRitual();
+          setLocked(false);
+          generateNewRitual();
+        }
+        return;
+      }
+
+      tapTimeout = setTimeout(() => {
+        tapCount = 0;
+      }, 500);
+    }
+
+    // ===========================================
+    // CAMERA BACKGROUND
+    // ===========================================
+
+    async function toggleCamera() {
+      if (cameraActive) {
+        // Turn off camera
+        stopCameraProcessing();
+        if (cameraStream) {
+          cameraStream.getTracks().forEach(track => track.stop());
+          cameraStream = null;
+        }
+        cameraVideo.srcObject = null;
+        cameraVideo.classList.remove('active');
+        cameraOverlay.classList.remove('active');
+        previewButton.classList.remove('active');
+        cameraActive = false;
+      } else {
+        // Turn on camera
+        try {
+          // Request back camera on mobile, any camera on desktop
+          const constraints = {
+            video: {
+              facingMode: { ideal: 'environment' },
+              width: { ideal: 1920 },
+              height: { ideal: 1080 }
+            }
+          };
+
+          cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+          cameraVideo.srcObject = cameraStream;
+          cameraVideo.classList.add('active');
+          cameraOverlay.classList.add('active');
+          previewButton.classList.add('active');
+
+          // Wait for video to be ready before setting cameraActive
+          // This ensures readyState >= 2 for iOS Safari
+          if (cameraVideo.readyState >= 2) {
+            cameraActive = true;
+            startCameraProcessing(cameraVideo);
+          } else {
+            await new Promise(resolve => {
+              cameraVideo.addEventListener('loadeddata', () => {
+                cameraActive = true;
+                startCameraProcessing(cameraVideo);
+                resolve();
+              }, { once: true });
+            });
+          }
+        } catch (err) {
+          console.log('Camera access denied or not available:', err);
+          // Reset everything back to normal state
+          stopCameraProcessing();
+          if (cameraStream) {
+            cameraStream.getTracks().forEach(track => track.stop());
+            cameraStream = null;
+          }
+          cameraVideo.srcObject = null;
+          cameraVideo.classList.remove('active');
+          cameraCanvas.classList.remove('active');
+          cameraOverlay.classList.remove('active');
+          previewButton.classList.remove('active');
+          cameraActive = false;
+        }
+      }
+    }
+
+    // ===========================================
+    // SAVE AS IMAGE
+    // ===========================================
+
+    // Detect iOS
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+    function showImagePreview(dataUrl) {
+      imagePreview.src = dataUrl;
+      imagePreviewOverlay.classList.add('visible');
+    }
+
+    function hideImagePreview() {
+      imagePreviewOverlay.classList.remove('visible');
+      imagePreview.src = '';
+    }
+
+    imagePreviewClose.addEventListener('click', hideImagePreview);
+    imagePreviewOverlay.addEventListener('click', (e) => {
+      if (e.target === imagePreviewOverlay) {
+        hideImagePreview();
+      }
+    });
+
+    async function saveAsImage() {
+      saveButton.classList.add('saving');
+
+      try {
+        // Flash effect
+        flashOverlay.classList.add('flash');
+        setTimeout(() => flashOverlay.classList.remove('flash'), 150);
+
+        // Phone wallpaper dimensions
+        const width = 1179;
+        const height = 2556;
+        const paddingTop = 940;
+        const paddingSide = 110;
+
+        // Create canvas
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+
+        // If camera is active but video not ready, wait for it
+        if (cameraActive && cameraVideo.readyState < 2) {
+          await new Promise(resolve => {
+            const checkReady = () => {
+              if (cameraVideo.readyState >= 2) {
+                resolve();
+              } else {
+                cameraVideo.addEventListener('loadeddata', resolve, { once: true });
+              }
+            };
+            checkReady();
+          });
+        }
+
+        // Check if camera is active - use blurred video as background
+        if (cameraActive && cameraVideo.readyState >= 2) {
+          // Calculate cover dimensions for video
+          const videoRatio = cameraVideo.videoWidth / cameraVideo.videoHeight;
+          const canvasRatio = width / height;
+          let drawWidth, drawHeight, offsetX, offsetY;
+
+          if (videoRatio > canvasRatio) {
+            drawHeight = height * 1.15;
+            drawWidth = drawHeight * videoRatio;
+            offsetX = (width - drawWidth) / 2;
+            offsetY = (height - drawHeight) / 2;
+          } else {
+            drawWidth = width * 1.15;
+            drawHeight = drawWidth / videoRatio;
+            offsetX = (width - drawWidth) / 2;
+            offsetY = (height - drawHeight) / 2;
+          }
+
+          // Use downscale-upscale blur (works on iOS Safari)
+          // Scale blur proportionally to match live camera appearance
+          const screenWidth = window.innerWidth;
+          const blurAmount = Math.round(25 * (width / screenWidth));
+          const smallWidth = Math.floor(width / blurAmount);
+          const smallHeight = Math.floor(height / blurAmount);
+
+          // Create small canvas for downscaling
+          const smallCanvas = document.createElement('canvas');
+          smallCanvas.width = smallWidth;
+          smallCanvas.height = smallHeight;
+          const smallCtx = smallCanvas.getContext('2d');
+          smallCtx.imageSmoothingEnabled = true;
+          smallCtx.imageSmoothingQuality = 'high';
+
+          // Draw video to small canvas (downscale)
+          smallCtx.drawImage(cameraVideo,
+            offsetX / blurAmount, offsetY / blurAmount,
+            drawWidth / blurAmount, drawHeight / blurAmount);
+
+          // Multiple blur passes for smoother result
+          for (let i = 0; i < 10; i++) {
+            smallCtx.drawImage(smallCanvas, 0, 0, smallWidth, smallHeight);
+          }
+
+          // Draw small canvas to main canvas (upscale = blur effect)
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          // Apply canvas filter blur to smooth pixelated edges (scale proportionally to output size)
+          const blurPx = Math.round(40 * (width / screenWidth));
+          ctx.filter = `blur(${blurPx}px)`;
+          ctx.drawImage(smallCanvas, 0, 0, width, height);
+          ctx.filter = 'none';
+
+          // Apply time-based color mapping (same as live camera)
+          const imageData = ctx.getImageData(0, 0, width, height);
+          const data = imageData.data;
+          const { blackColor, whiteColor } = getTimeColors();
+
+          for (let i = 0; i < data.length; i += 4) {
+            // Convert to grayscale (luminance)
+            const gray = data[i] * 0.299 + data[i+1] * 0.587 + data[i+2] * 0.114;
+            let t = gray / 255;
+
+            // Softer contrast - blend S-curve with linear for gentler effect
+            const curved = t * t * (3 - 2 * t);
+            t = t * 0.6 + curved * 0.4;
+
+            // Map grayscale to time-based colors
+            data[i] = blackColor[0] + (whiteColor[0] - blackColor[0]) * t;
+            data[i+1] = blackColor[1] + (whiteColor[1] - blackColor[1]) * t;
+            data[i+2] = blackColor[2] + (whiteColor[2] - blackColor[2]) * t;
+          }
+          ctx.putImageData(imageData, 0, 0);
+
+          // Add subtle pixel noise
+          const noiseData = ctx.getImageData(0, 0, width, height);
+          const nData = noiseData.data;
+          for (let i = 0; i < nData.length; i += 4) {
+            const noise = (Math.random() - 0.5) * 12;
+            nData[i] = Math.max(0, Math.min(255, nData[i] + noise));
+            nData[i+1] = Math.max(0, Math.min(255, nData[i+1] + noise));
+            nData[i+2] = Math.max(0, Math.min(255, nData[i+2] + noise));
+          }
+          ctx.putImageData(noiseData, 0, 0);
+
+          // Add subtle vignette
+          const vignette = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width * 0.8);
+          vignette.addColorStop(0, 'transparent');
+          vignette.addColorStop(1, 'rgba(0, 0, 0, 0.25)');
+          ctx.fillStyle = vignette;
+          ctx.fillRect(0, 0, width, height);
+        } else {
+          // Use simplex noise background with time-based colors (same as live background)
+          const scale = 8;
+          const w = Math.ceil(width / scale);
+          const h = Math.ceil(height / scale);
+
+          // Create small canvas for noise generation
+          const smallCanvas = document.createElement('canvas');
+          smallCanvas.width = w;
+          smallCanvas.height = h;
+          const smallCtx = smallCanvas.getContext('2d');
+          const imageData = smallCtx.createImageData(w, h);
+          const data = imageData.data;
+
+          const { blackColor, whiteColor } = getTimeColors();
+
+          // Noise parameters (same as live background)
+          const referenceSize = 390;
+          const scaleFactor = referenceSize / Math.min(width, height);
+          const noiseScale = 0.008 * scaleFactor;
+
+          // Generate noise and map to colors (static, no movement)
+          for (let y = 0; y < h; y++) {
+            for (let x = 0; x < w; x++) {
+              let noiseVal = 0;
+              noiseVal += bgNoise(x * noiseScale, y * noiseScale) * 0.6;
+              noiseVal += bgNoise(x * noiseScale * 2, y * noiseScale * 2) * 0.3;
+              noiseVal += bgNoise(x * noiseScale * 4, y * noiseScale * 4) * 0.1;
+
+              // Normalize to 0-1 with contrast boost
+              let t = (noiseVal + 1) / 2;
+              // Strong contrast boost to match webcam intensity
+              // Apply S-curve multiple times for stronger effect
+              t = t * t * (3 - 2 * t);
+              t = t * t * (3 - 2 * t);
+              t = t * t * (3 - 2 * t);
+
+              const idx = (y * w + x) * 4;
+              data[idx] = blackColor[0] + (whiteColor[0] - blackColor[0]) * t;
+              data[idx + 1] = blackColor[1] + (whiteColor[1] - blackColor[1]) * t;
+              data[idx + 2] = blackColor[2] + (whiteColor[2] - blackColor[2]) * t;
+              data[idx + 3] = 255;
+            }
+          }
+
+          smallCtx.putImageData(imageData, 0, 0);
+
+          // Draw to main canvas with smoothing (creates blur effect)
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(smallCanvas, 0, 0, width, height);
+
+          // Add pixel noise overlay
+          const grainData = ctx.getImageData(0, 0, width, height);
+          const gData = grainData.data;
+          for (let i = 0; i < gData.length; i += 4) {
+            const noise = (Math.random() - 0.5) * 12;
+            gData[i] = Math.max(0, Math.min(255, gData[i] + noise));
+            gData[i+1] = Math.max(0, Math.min(255, gData[i+1] + noise));
+            gData[i+2] = Math.max(0, Math.min(255, gData[i+2] + noise));
+          }
+          ctx.putImageData(grainData, 0, 0);
+        }
+
+        ctx.globalCompositeOperation = 'source-over';
+
+        // Get ritual text
+        const ritualText1 = row1.innerText || row1.textContent;
+        const ritualText2 = row2.innerText || row2.textContent;
+        const ritualText3 = row3.innerText || row3.textContent;
+
+        // Ritual text settings
+        const fontSize = 90;
+        const lineHeight = fontSize;
+
+        // Helper to wrap and draw text with highlights
+        function drawRitualLine(text, x, y, maxWidth, isRightAligned) {
+          ctx.font = `500 ${fontSize}px "Helvetica Neue", Helvetica, Arial, sans-serif`;
+          // Split into words and find highlighted word
+          const words = text.split(' ');
+          let currentLine = '';
+          let lines = [];
+
+          // Simple word wrap
+          for (let word of words) {
+            const testLine = currentLine ? currentLine + ' ' + word : word;
+            const metrics = ctx.measureText(testLine);
+            if (metrics.width > maxWidth && currentLine) {
+              lines.push(currentLine);
+              currentLine = word;
+            } else {
+              currentLine = testLine;
+            }
+          }
+          if (currentLine) lines.push(currentLine);
+
+          // Draw each line
+          lines.forEach((line, i) => {
+            const lineY = y + (i * lineHeight);
+            const lineWidth = ctx.measureText(line).width;
+            const startX = isRightAligned ? (width - paddingSide - lineWidth) : x;
+
+            // Draw word by word to handle highlighting
+            let xPos = startX;
+            const lineWords = line.split(' ');
+            lineWords.forEach((word, wi) => {
+              // First word of first line is highlighted (simplified)
+              const isHighlight = (i === 0 && wi === 0);
+              ctx.fillStyle = isHighlight ? '#F5F5F5' : '#2D2D2D';
+              ctx.fillText(word, xPos, lineY);
+              xPos += ctx.measureText(word + ' ').width;
+            });
+          });
+
+          return lines.length * lineHeight;
+        }
+
+        // Draw ritual text starting at paddingTop (below lock screen clock area)
+        let currentY = paddingTop;
+        const maxWidth = width - (paddingSide * 2);
+        currentY += drawRitualLine(ritualText1, paddingSide, currentY, maxWidth, false);
+        currentY += drawRitualLine(ritualText2, paddingSide, currentY, maxWidth, true);
+        currentY += drawRitualLine(ritualText3, paddingSide, currentY, maxWidth, false);
+
+        // Draw branding below ritual text
+        currentY += 2; // Gap after ritual
+        ctx.fillStyle = '#2D2D2D';
+        ctx.font = '500 48px "Helvetica Neue", Helvetica, Arial, sans-serif';
+        ctx.fillText('Random Ritualiser', paddingSide, currentY);
+        currentY += 42;
+
+        ctx.fillStyle = '#2D2D2D';
+        ctx.font = '500 48px "Helvetica Neue", Helvetica, Arial, sans-serif';
+        ctx.fillText('by Accept & Proceed', paddingSide, currentY);
+
+        // Convert to blob for sharing/saving
+        canvas.toBlob(async (blob) => {
+          const filename = `ritual-${Date.now()}.png`;
+
+          // Try Web Share API first (works on iOS 15+, Android, etc.)
+          if (navigator.share && navigator.canShare) {
+            const file = new File([blob], filename, { type: 'image/png' });
+            const shareData = { files: [file] };
+
+            if (navigator.canShare(shareData)) {
+              try {
+                await navigator.share(shareData);
+                saveButton.classList.remove('saving');
+                return;
+              } catch (err) {
+                if (err.name === 'AbortError') {
+                  saveButton.classList.remove('saving');
+                  return;
+                }
+                // If share failed for other reasons, continue to fallbacks
+              }
+            }
+          }
+
+          // iOS fallback: show image preview for long-press saving
+          if (isIOS) {
+            const dataUrl = canvas.toDataURL('image/png');
+            showImagePreview(dataUrl);
+            saveButton.classList.remove('saving');
+            return;
+          }
+
+          // Desktop fallback: download link
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+
+          saveButton.classList.remove('saving');
+        }, 'image/png');
+
+      } catch (error) {
+        console.error('Failed to save image:', error);
+        saveButton.classList.remove('saving');
+      }
+    }
+
+    // ===========================================
+    // EVENT LISTENERS
+    // ===========================================
+
+    previewButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleCamera();
+    });
+
+    saveButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      saveAsImage();
+    });
+
+    contributorsButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleContributorsPanel();
+    });
+
+    arrowButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      handleArrowClick();
+    });
+
+    regenButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!isLocked) {
+        generateNewRitual();
+      }
+    });
+
+    infoButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleInfoPanel();
+    });
+
+    closeButtonInfo.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showRitualScreen();
+    });
+
+    closeButtonContrib.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showRitualScreen();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' || e.key === 'Enter') {
+        e.preventDefault();
+        if (appState === 'start') {
+          startRitual();
+        } else if (appState === 'ritual' && !isLocked) {
+          generateNewRitual();
+        } else if (appState === 'info' || appState === 'help' || appState === 'contributors') {
+          showRitualScreen();
+        }
+      }
+      if (e.key === 'Escape' && (appState === 'info' || appState === 'help' || appState === 'contributors')) {
+        showRitualScreen();
+      }
+    });
+
+    // ===========================================
+    // SUBMIT FLOW
+    // ===========================================
+
+    let submitStep = 0;
+    const submitSteps = [
+      document.getElementById('submitStep1'),
+      document.getElementById('submitStep2'),
+      document.getElementById('submitStep3'),
+      document.getElementById('submitStep4'),
+      document.getElementById('submitStep5'),
+      document.getElementById('submitStep6')
+    ];
+
+    const submitInputs = {
+      2: document.getElementById('submitInput2'),
+      3: document.getElementById('submitInput3'),
+      4: document.getElementById('submitInput4'),
+      5: document.getElementById('submitInput5')
+    };
+
+    const submitCounters = {
+      2: document.getElementById('counter2'),
+      3: document.getElementById('counter3'),
+      4: document.getElementById('counter4'),
+      5: document.getElementById('counter5')
+    };
+
+    // Helper to get text from contenteditable (converts &nbsp; to regular space)
+    function getInputText(input) {
+      return input.textContent.replace(/\u00A0/g, ' ');
+    }
+
+    // Helper to set text in contenteditable (preserves spaces using &nbsp;)
+    function setInputText(input, text) {
+      input.innerHTML = text.replace(/ /g, '&nbsp;');
+    }
+
+    // Setup input handlers for character counting and limit
+    Object.keys(submitInputs).forEach(step => {
+      const input = submitInputs[step];
+      const counter = submitCounters[step];
+
+      // Handle spacebar and Enter key
+      input.addEventListener('keydown', (e) => {
+        if (e.key === ' ' || e.code === 'Space') {
+          e.preventDefault();
+          // Insert &nbsp; at cursor position
+          const sel = window.getSelection();
+          if (sel.rangeCount > 0) {
+            const range = sel.getRangeAt(0);
+            range.deleteContents();
+            const nbsp = document.createTextNode('\u00A0');
+            range.insertNode(nbsp);
+            range.setStartAfter(nbsp);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+            // Trigger input event for counter update
+            input.dispatchEvent(new Event('input'));
+          }
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+        }
+      });
+
+      input.addEventListener('input', () => {
+        // Enforce 32 character limit
+        let text = getInputText(input);
+        if (text.length > 32) {
+          text = text.substring(0, 32);
+          setInputText(input, text);
+          // Move cursor to end
+          const sel = window.getSelection();
+          const range = document.createRange();
+          range.selectNodeContents(input);
+          range.collapse(false);
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+        // Update character counter
+        counter.textContent = getInputText(input).length;
+      });
+    });
+
+    function openModal() {
+      submitStep = 1;
+      showSubmitStep(1);
+      // Hide ritual and UI
+      mainContent.classList.add('content-hidden');
+      arrowButton.classList.remove('visible');
+      regenButton.classList.remove('visible');
+      iconButtons.classList.remove('visible');
+      saveButtonContainer.classList.remove('visible');
+    }
+
+    function closeSubmitFlow() {
+      // Hide all submit steps
+      submitSteps.forEach(step => step.classList.remove('visible'));
+      // Reset inputs
+      Object.keys(submitInputs).forEach(step => {
+        submitInputs[step].textContent = '';
+        submitCounters[step].textContent = '0';
+      });
+      submitStep = 0;
+      // Show ritual screen
+      showRitualScreen();
+    }
+
+    function showSubmitStep(step) {
+      submitSteps.forEach((el, i) => {
+        if (i === step - 1) {
+          el.classList.add('visible');
+        } else {
+          el.classList.remove('visible');
+        }
+      });
+      submitStep = step;
+      // Focus input if this step has one
+      if (submitInputs[step]) {
+        setTimeout(() => submitInputs[step].focus(), 100);
+      }
+    }
+
+    function nextSubmitStep() {
+      // Submit current step's data before moving on (if text length > 1)
+      if (submitStep >= 2 && submitStep <= 5) {
+        const currentInput = submitInputs[submitStep];
+        const text = currentInput ? getInputText(currentInput).trim() : '';
+        if (text.length > 1) {
+          submitStepData(submitStep, text);
+        }
+      }
+
+      if (submitStep < 6) {
+        showSubmitStep(submitStep + 1);
+      }
+    }
+
+    async function submitStepData(step, text) {
+      if (!APPS_SCRIPT_URL) return;
+
+      // Map step number to column type
+      const columnMap = {
+        2: 'location',  // Column A
+        3: 'moment',    // Column B
+        4: 'focus',     // Column C
+        5: 'contributor' // Column D
+      };
+
+      const column = columnMap[step];
+      if (!column) return;
+
+      try {
+        const params = new URLSearchParams({
+          action: 'submit',
+          column: column,
+          value: text
+        });
+
+        await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`, {
+          method: 'GET',
+          mode: 'no-cors'
+        });
+        console.log(`Submitted ${column}: ${text}`);
+      } catch (error) {
+        console.error('Submission failed:', error);
+      }
+    }
+
+    // Submit flow button listeners
+    document.getElementById('submitStartBtn').addEventListener('click', () => nextSubmitStep());
+    document.getElementById('submitNext2').addEventListener('click', () => nextSubmitStep());
+    document.getElementById('submitNext3').addEventListener('click', () => nextSubmitStep());
+    document.getElementById('submitNext4').addEventListener('click', () => nextSubmitStep());
+    document.getElementById('submitNext5').addEventListener('click', () => nextSubmitStep());
+
+    // Close button listeners for submit panels
+    document.getElementById('closeSubmit1').addEventListener('click', closeSubmitFlow);
+    document.getElementById('closeSubmit2').addEventListener('click', closeSubmitFlow);
+    document.getElementById('closeSubmit3').addEventListener('click', closeSubmitFlow);
+    document.getElementById('closeSubmit4').addEventListener('click', closeSubmitFlow);
+    document.getElementById('closeSubmit5').addEventListener('click', closeSubmitFlow);
+    document.getElementById('closeSubmit6').addEventListener('click', closeSubmitFlow);
+
+    // Click anywhere on submit panel (except buttons) to refocus input
+    [2, 3, 4, 5].forEach(step => {
+      document.getElementById(`submitStep${step}`).addEventListener('click', (e) => {
+        // Don't refocus if clicking a button
+        if (e.target.tagName === 'BUTTON') return;
+        submitInputs[step].focus();
+      });
+    });
+
+    // ===========================================
+    // EFFECT SELECTOR
+    // ===========================================
+
+    function setEffect(effectNum) {
+      currentEffect = effectNum;
+
+      // Update button states
+      effectButtons.querySelectorAll('.effect-btn').forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.effect) === effectNum);
+      });
+    }
+
+    effectButtons.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const btn = e.target.closest('.effect-btn');
+      if (btn) {
+        const effectNum = parseInt(btn.dataset.effect);
+        if (EFFECTS[effectNum]) {
+          setEffect(effectNum);
+        }
+      }
+    });
+
+    // ===========================================
+    // HEADER SCRAMBLE EFFECT
+    // ===========================================
+
+    const headerTitle = document.getElementById('headerTitle');
+    const headerSub = document.getElementById('headerSub');
+
+    const headerTexts = [
+      { title: 'Random Ritualiser', sub: 'by Accept & Proceed' },
+      { title: 'The new outdoors is everywhere,', sub: 'not just the wilderness.' }
+    ];
+
+    let currentHeaderIndex = 0;
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    let headerCycleInterval = null;
+    let isPageVisible = true;
+    let activeScrambleIntervals = [];
+
+    // Pause animations when tab is hidden
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        isPageVisible = false;
+        // Clear header cycle interval
+        if (headerCycleInterval) {
+          clearInterval(headerCycleInterval);
+          headerCycleInterval = null;
+        }
+        // Clear any active scramble intervals
+        activeScrambleIntervals.forEach(id => clearInterval(id));
+        activeScrambleIntervals = [];
+      } else {
+        isPageVisible = true;
+        // Restart header cycle
+        if (!headerCycleInterval) {
+          headerCycleInterval = setInterval(cycleHeaderText, 8000);
+        }
+      }
+    });
+
+    function scrambleText(element, targetText, duration = 1000) {
+      // Don't start if page is hidden
+      if (!isPageVisible) {
+        element.textContent = targetText;
+        return Promise.resolve();
+      }
+      return new Promise(resolve => {
+        const originalText = element.textContent;
+        const intervalTime = 25;
+        const charDelay = 1; // Ticks between each character
+        const scrambleCycles = 2; // Scrambles before resolving
+
+        // Phase 1: Encrypt current text (left to right)
+        // Phase 2: Hold scrambled (adjust length)
+        // Phase 3: Decrypt to new text (left to right)
+
+        let phase = 1;
+        let tickCount = 0;
+        let encrypted = new Array(originalText.length).fill(false);
+        let decrypted = new Array(targetText.length).fill(false);
+        let decryptIterations = new Array(targetText.length).fill(0);
+        let currentDisplay = originalText;
+        let intervalId = null;
+
+        intervalId = setInterval(() => {
+          // Skip if page is hidden
+          if (!isPageVisible) return;
+          tickCount++;
+
+          if (phase === 1) {
+            // ENCRYPT PHASE: scramble original text left to right
+            let newText = '';
+            let allEncrypted = true;
+
+            for (let i = 0; i < originalText.length; i++) {
+              if (encrypted[i]) {
+                // Already encrypted - show random
+                if (originalText[i] === ' ') {
+                  newText += ' ';
+                } else {
+                  newText += chars[Math.floor(Math.random() * chars.length)];
+                }
+              } else if (tickCount >= i * charDelay) {
+                // Encrypt this character
+                encrypted[i] = true;
+                if (originalText[i] === ' ') {
+                  newText += ' ';
+                } else {
+                  newText += chars[Math.floor(Math.random() * chars.length)];
+                }
+              } else {
+                // Not yet encrypted - show original
+                newText += originalText[i];
+                allEncrypted = false;
+              }
+            }
+
+            element.textContent = newText;
+
+            if (allEncrypted) {
+              // Move to phase 2 - adjust length while scrambled
+              phase = 2;
+              tickCount = 0;
+            }
+
+          } else if (phase === 2) {
+            // TRANSITION PHASE: adjust to target length while scrambled
+            let newText = '';
+            const currentLen = element.textContent.length;
+            const targetLen = targetText.length;
+
+            // Gradually adjust length
+            let displayLen;
+            if (currentLen < targetLen) {
+              displayLen = Math.min(currentLen + 1, targetLen);
+            } else if (currentLen > targetLen) {
+              displayLen = Math.max(currentLen - 1, targetLen);
+            } else {
+              displayLen = targetLen;
+            }
+
+            for (let i = 0; i < displayLen; i++) {
+              if (targetText[i] === ' ') {
+                newText += ' ';
+              } else {
+                newText += chars[Math.floor(Math.random() * chars.length)];
+              }
+            }
+
+            element.textContent = newText;
+
+            if (displayLen === targetLen && tickCount > 5) {
+              // Move to decrypt phase
+              phase = 3;
+              tickCount = 0;
+            }
+
+          } else if (phase === 3) {
+            // DECRYPT PHASE: resolve to target text left to right
+            let newText = '';
+            let allDecrypted = true;
+
+            for (let i = 0; i < targetText.length; i++) {
+              if (decrypted[i]) {
+                // Already decrypted - show final character
+                newText += targetText[i];
+              } else {
+                // Check if this character should start decrypting
+                const startTick = i * charDelay;
+                if (tickCount >= startTick) {
+                  decryptIterations[i]++;
+
+                  if (decryptIterations[i] > scrambleCycles) {
+                    // Decrypt this character
+                    decrypted[i] = true;
+                    newText += targetText[i];
+                  } else {
+                    // Still scrambling
+                    if (targetText[i] === ' ') {
+                      newText += ' ';
+                    } else {
+                      newText += chars[Math.floor(Math.random() * chars.length)];
+                    }
+                    allDecrypted = false;
+                  }
+                } else {
+                  // Not started yet - show scrambled
+                  if (targetText[i] === ' ') {
+                    newText += ' ';
+                  } else {
+                    newText += chars[Math.floor(Math.random() * chars.length)];
+                  }
+                  allDecrypted = false;
+                }
+              }
+            }
+
+            element.textContent = newText;
+
+            if (allDecrypted) {
+              clearInterval(intervalId);
+              element.textContent = targetText;
+              resolve();
+            }
+          }
+        }, intervalTime);
+      });
+    }
+
+    async function cycleHeaderText() {
+      // Switch to next text pair
+      currentHeaderIndex = (currentHeaderIndex + 1) % headerTexts.length;
+      const nextText = headerTexts[currentHeaderIndex];
+
+      // Scramble both lines (1 second total)
+      await Promise.all([
+        scrambleText(headerTitle, nextText.title, 1000),
+        scrambleText(headerSub, nextText.sub, 1000)
+      ]);
+    }
+
+    // Typewriter effect for initial load
+    function typeText(element, text, charDelay = 40) {
+      return new Promise(resolve => {
+        element.textContent = '';
+        let i = 0;
+        const typeInterval = setInterval(() => {
+          if (i < text.length) {
+            element.textContent += text[i];
+            i++;
+          } else {
+            clearInterval(typeInterval);
+            resolve();
+          }
+        }, charDelay);
+      });
+    }
+
+    // Start the header cycle after initial typeout
+    async function startHeaderCycle() {
+      const targetTitle = headerTexts[0].title;
+      const targetSub = headerTexts[0].sub;
+
+      // Start empty
+      headerTitle.textContent = '';
+      headerSub.textContent = '';
+
+      // Small delay then type out
+      await new Promise(r => setTimeout(r, 300));
+
+      // Type out first line
+      await typeText(headerTitle, targetTitle, 32);
+
+      // Small pause then type second line
+      await new Promise(r => setTimeout(r, 180));
+      await typeText(headerSub, targetSub, 36);
+
+      // Cycle every 8 seconds
+      headerCycleInterval = setInterval(cycleHeaderText, 8000);
+    }
+
+    // ===========================================
+    // INITIALIZE
+    // ===========================================
+
+    // Always use effect 4 (blur-resolve)
+    setEffect(4);
+
+    // Start header scramble effect
+    startHeaderCycle();
+
+    // Show landing screen with animation (auto-progresses to ritual)
+    showLandingScreen();
+    animateLandingText();
+  </script>
+</body>
+</html>
